@@ -1,0 +1,61 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:local="clr-namespace:PropertyManagementUi">
+
+    <local:NumberThicknessConverter x:Key="ThicknessConverter"/>
+
+    <Style TargetType="local:CircularButton">
+        <Setter Property="Template">
+            <Setter.Value>
+
+                <ControlTemplate TargetType="local:CircularButton">
+
+                    <Grid>
+                        <Ellipse x:Name="BtnEllipse" Width="Auto" Height="Auto" StrokeThickness="{TemplateBinding HighlightStrokeThickness}" Fill="{TemplateBinding Background}"/>
+                        <Image Margin="{TemplateBinding Padding}" Source="{TemplateBinding IconSource}"/>
+                    </Grid>
+
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="BtnEllipse" Property="Stroke" Value="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=HighlightStroke}"/>
+                        </Trigger>
+
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="BtnEllipse" Property="Fill" Value="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=PressedBackground}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="local:RoundedButton">
+        <Setter Property="Template">
+            <Setter.Value>
+
+                <ControlTemplate TargetType="local:RoundedButton">
+
+                    <Border x:Name="BtnBorder" Background="{TemplateBinding Background}" BorderThickness="{TemplateBinding HighlightStrokeThickness, Converter={StaticResource ThicknessConverter}}" CornerRadius="{TemplateBinding CornerRadius}">
+                        <Grid>
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Grid>
+                    </Border>
+
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="BtnBorder" Property="BorderBrush" Value="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=HighlightStroke}"/>
+                        </Trigger>
+
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="BtnBorder" Property="Background" Value="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=PressedBackground}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+
+                </ControlTemplate>
+                
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+</ResourceDictionary>

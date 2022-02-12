@@ -1,0 +1,250 @@
+﻿<Page x:Class="PropertyManagementUi.IndexPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:PropertyManagementUi"
+      mc:Ignorable="d" 
+      d:DesignHeight="800" d:DesignWidth="1300"
+      Title="Index Page">
+
+    <Page.Resources>
+
+        <Style x:Key="PanelButton" TargetType="Button">
+
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="BtnBorder" Style="{StaticResource InfoPanel}">
+                            <ContentPresenter VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                        </Border>
+
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="BtnBorder" Property="Background" Value="#F0F0F0"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+
+            <Setter Property="Cursor" Value="Hand"/>
+
+        </Style>
+
+    </Page.Resources>
+    
+    <ScrollViewer HorizontalScrollBarVisibility="Auto">
+        <StackPanel Orientation="Vertical" Margin="8" MaxWidth="1300" MinWidth="1200" HorizontalAlignment="Center">
+            <Grid Margin="0 0 0 5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Grid.Column="0" Style="{StaticResource PageHeading}" Margin="0 0 20 0" VerticalAlignment="Center" Text="Property Dashboard"/>
+
+                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                    <TextBlock FontWeight="Bold" Text="Occupancy"/>
+                    <CheckBox Margin="0 3" Content="Occupied" IsChecked="{Binding ShowOccupied, Mode=TwoWay}"/>
+                    <CheckBox Margin="0 3" Content="Unoccupied" IsChecked="{Binding ShowUnoccupied, Mode=TwoWay}"/>
+                </StackPanel>
+                <local:CircularButton Grid.Column="3" Click="RefreshButtonClick" Style="{StaticResource RefreshButton}" Width="50" Height="50" HighlightStrokeThickness="3" Padding="12" Margin="5" ToolTip="Reload"/>
+                <local:CircularButton Grid.Column="4" Click="AddButtonClick" Style="{StaticResource AddButton}" Width="65" Height="65" HighlightStrokeThickness="3" Padding="12" Margin="5" ToolTip="Add Property"/>
+            </Grid>
+
+            <TextBlock HorizontalAlignment="Center" FontSize="32" Text="NO PROPERTIES TO DISPLAY" Margin="0 8 0 0"
+                       Visibility="{Binding Properties, Converter={StaticResource VisibleIfEmpty}}"/>
+
+            <ItemsControl ItemsSource="{Binding Properties}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+
+                        <Button Style="{StaticResource PanelButton}" Tag="{Binding}" Click="PropertyPanelClick" Margin="0 5">
+                            <Button.Content>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" MinWidth="150" MaxWidth="300"/>
+                                        <ColumnDefinition Width="Auto" MinWidth="150" MaxWidth="300"/>
+                                        <ColumnDefinition Width="Auto" MaxWidth="150"/>
+                                        <ColumnDefinition Width="Auto" MaxWidth="200"/>
+                                        <ColumnDefinition Width="Auto" MaxWidth="200"/>
+                                        <ColumnDefinition Width="Auto" MaxWidth="200"/>
+                                        <ColumnDefinition Width="Auto" MaxWidth="200"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <StackPanel Grid.Column="0" Margin="6 0">
+                                        <TextBlock FontSize="14" FontWeight="Bold" Text="Address"/>
+                                        <TextBlock Text="{Binding StreetAddress1}"/>
+                                        <TextBlock Text="{Binding StreetAddress2}" Visibility="{Binding StreetAddress2, Converter={StaticResource VisibleIfNotNullOrEmpty}}"/>
+                                        <TextBlock Text="{Binding Locality}" Visibility="{Binding Locality, Converter={StaticResource VisibleIfNotNullOrEmpty}}"/>
+                                        <TextBlock Text="{Binding City}"/>
+                                        <TextBlock Text="{Binding County}" Visibility="{Binding County, Converter={StaticResource VisibleIfNotNullOrEmpty}}"/>
+                                        <TextBlock Text="{Binding Country}"/>
+                                        <TextBlock Text="{Binding Postcode}"/>
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Column="1" Margin="6 0">
+
+                                        <TextBlock FontSize="14" FontWeight="Bold" Text="Tenants"/>
+
+                                        <TextBlock Visibility="{Binding IsOccupied, Converter={StaticResource VisibleIfFalse}}" Text="UNOCCUPIED"/>
+
+                                        <ItemsControl Visibility="{Binding IsOccupied, Converter={StaticResource VisibleIfTrue}}" ItemsSource="{Binding Tenants}">
+                                            <ItemsControl.ItemsPanel>
+                                                <ItemsPanelTemplate>
+                                                    <StackPanel/>
+                                                </ItemsPanelTemplate>
+                                            </ItemsControl.ItemsPanel>
+
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <TextBlock Text="{Binding}"/>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Column="2" Margin="6 0">
+                                        <TextBlock  FontWeight="Bold" Text="Outstanding Balance"/>
+                                        <TextBlock Margin="0 0 0 8" FontSize="20" Text="{Binding OutstandingBalance, StringFormat='£##,#.00;-£##,#.00;NIL', TargetNullValue='N/A'}"/>
+                                        <TextBlock FontWeight="Bold" Text="Next Payment Due"/>
+                                        <TextBlock FontSize="20" Text="{Binding NextPaymentDue, StringFormat='dd MMMM', TargetNullValue='N/A'}"/>
+                                    </StackPanel>
+
+                                    <Grid Grid.Column="3" Margin="6 0 18 0" Height="Auto" VerticalAlignment="Center">
+
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="*"/>
+                                        </Grid.RowDefinitions>
+
+                                        <Image Grid.Column="0" Grid.Row="0" Grid.RowSpan="3" Margin="0 0 8 0" Source="{StaticResource InsuranceIcon}" Width="50"/>
+
+                                        <TextBlock Grid.Column="1" Grid.Row="0" FontWeight="Bold" Text="Insurance"/>
+                                        <TextBlock Grid.Column="1" Grid.Row="1" Visibility="{Binding InsuranceEndDate, Converter={StaticResource VisibleIfNotNull}}"
+                                               Text="Valid until"/>
+                                        <Border Grid.Column="1" Grid.Row="2" Visibility="{Binding InsuranceEndDate, Converter={StaticResource VisibleIfNotNull}}"
+                                            Background="{Binding InsuranceEndDate, Converter={StaticResource DateBrush}}" CornerRadius="3"
+                                            Margin="0 3">
+                                            <TextBlock Visibility="{Binding InsuranceEndDate, Converter={StaticResource VisibleIfNotNull}}"
+                                                   FontSize="20" Text="{Binding InsuranceEndDate, StringFormat='dd MMM yyyy'}"/>
+                                        </Border>
+                                        <TextBlock Grid.Column="1" Grid.Row="1" Visibility="{Binding InsuranceEndDate, Converter={StaticResource VisibleIfNull}}"
+                                               FontSize="14" FontWeight="Bold" Foreground="Red" Text="NO INSURANCE"/>
+
+                                    </Grid>
+
+                                    <Grid Grid.Column="4" Margin="6 0 18 0" Height="Auto" VerticalAlignment="Center">
+
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="*"/>
+                                        </Grid.RowDefinitions>
+
+                                        <Image Grid.Column="0" Grid.Row="0" Grid.RowSpan="3" Margin="0 0 8 0" Source="{StaticResource ElectricityIcon}" Width="50"/>
+
+                                        <TextBlock Grid.Column="1" Grid.Row="0" FontWeight="Bold" Text="Electrical Inspection"/>
+                                        <TextBlock Grid.Column="1" Grid.Row="1" Visibility="{Binding ElectricalInspectionExpiry, Converter={StaticResource VisibleIfNotNull}}"
+                                               Text="Valid until"/>
+                                        <Border Grid.Column="1" Grid.Row="2" Visibility="{Binding ElectricalInspectionExpiry, Converter={StaticResource VisibleIfNotNull}}"
+                                            Background="{Binding ElectricalInspectionExpiry, Converter={StaticResource DateBrush}}" CornerRadius="3"
+                                            Margin="0 3">
+                                            <TextBlock Visibility="{Binding ElectricalInspectionExpiry, Converter={StaticResource VisibleIfNotNull}}"
+                                                   FontSize="20" Text="{Binding ElectricalInspectionExpiry, StringFormat='dd MMM yyyy'}"/>
+                                        </Border>
+                                        <TextBlock Grid.Column="1" Grid.Row="1" Visibility="{Binding ElectricalInspectionExpiry, Converter={StaticResource VisibleIfNull}}"
+                                               FontSize="14" FontWeight="Bold" Foreground="Red" Text="NO CERTIFICATE"/>
+
+                                    </Grid>
+
+                                    <Grid Grid.Column="5" Margin="6 0 18 0" Height="Auto" VerticalAlignment="Center">
+
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="*"/>
+                                        </Grid.RowDefinitions>
+
+                                        <Image Grid.Column="0" Grid.Row="0" Grid.RowSpan="3" Margin="0 0 8 0" Source="{StaticResource GasIcon}" Width="50"/>
+
+                                        <TextBlock Grid.Column="1" Grid.Row="0" FontWeight="Bold" Text="Gas Safety"/>
+                                        <TextBlock Grid.Column="1" Grid.Row="1" Visibility="{Binding GasSafetyExpiry, Converter={StaticResource VisibleIfNotNull}}"
+                                               Text="Valid until"/>
+                                        <Border Grid.Column="1" Grid.Row="2" Visibility="{Binding GasSafetyExpiry, Converter={StaticResource VisibleIfNotNull}}"
+                                            Background="{Binding GasSafetyExpiry, Converter={StaticResource DateBrush}}" CornerRadius="3"
+                                            Margin="0 3">
+                                            <TextBlock Visibility="{Binding GasSafetyExpiry, Converter={StaticResource VisibleIfNotNull}}"
+                                                   FontSize="20" Text="{Binding GasSafetyExpiry, StringFormat='dd MMM yyyy'}"/>
+                                        </Border>
+                                        <TextBlock Grid.Column="1" Grid.Row="1" Visibility="{Binding GasSafetyExpiry, Converter={StaticResource VisibleIfNull}}"
+                                               FontSize="14" FontWeight="Bold" Foreground="Red" Text="NO CERTIFICATE"/>
+
+                                    </Grid>
+
+                                    <Grid Grid.Column="6" Margin="6 0 18 0" Height="Auto" VerticalAlignment="Center">
+
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="*"/>
+                                        </Grid.RowDefinitions>
+
+                                        <Image Grid.Column="0" Grid.Row="0" Grid.RowSpan="3" Margin="0 0 8 0" Source="{StaticResource EnergyIcon}" Width="50"/>
+
+                                        <TextBlock Grid.Column="1" Grid.Row="0" FontWeight="Bold" Text="EPC"/>
+                                        <TextBlock Grid.Column="1" Grid.Row="1" Visibility="{Binding EpcExpiry, Converter={StaticResource VisibleIfNotNull}}"
+                                               Text="Valid until"/>
+                                        <Border Grid.Column="1" Grid.Row="2" Visibility="{Binding EpcExpiry, Converter={StaticResource VisibleIfNotNull}}"
+                                            Background="{Binding EpcExpiry, Converter={StaticResource DateBrush}}" CornerRadius="3"
+                                            Margin="0 3">
+                                            <TextBlock Grid.Column="1" Grid.Row="2" Visibility="{Binding EpcExpiry, Converter={StaticResource VisibleIfNotNull}}"
+                                                   FontSize="20" Text="{Binding EpcExpiry, StringFormat='dd MMM yyyy'}"/>
+                                        </Border>
+                                        <TextBlock Grid.Column="1" Grid.Row="1" Visibility="{Binding EpcExpiry, Converter={StaticResource VisibleIfNull}}"
+                                               FontSize="14" FontWeight="Bold" Foreground="Red" Text="NO CERTIFICATE"/>
+
+                                    </Grid>
+                                </Grid>
+                            </Button.Content>
+                        </Button>
+
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </StackPanel>
+    </ScrollViewer>
+</Page>

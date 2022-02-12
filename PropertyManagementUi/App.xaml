@@ -1,0 +1,205 @@
+﻿<Application x:Class="PropertyManagementUi.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:PropertyManagementUi"
+             xmlns:collections="clr-namespace:System.Collections;assembly=mscorlib"
+             xmlns:common="clr-namespace:PropertyManagementCommon;assembly=PropertyManagementCommon"
+             xmlns:system="clr-namespace:System;assembly=mscorlib"
+             Startup="ApplicationStartup">
+    
+    <Application.Resources>
+
+        <collections:Hashtable x:Key="PurchaseCostTypeOptions">
+            <system:String x:Key="{x:Static common:PurchaseCostType.SurveyAndValuation}">Survey &amp; Valuation</system:String>
+            <system:String x:Key="{x:Static common:PurchaseCostType.MortgageCosts}">Mortgage Costs</system:String>
+            <system:String x:Key="{x:Static common:PurchaseCostType.LawyersFeesAndDisbursements}">Lawyers Fees &amp; Disbursements</system:String>
+            <system:String x:Key="{x:Static common:PurchaseCostType.StampDuty}">Stamp Duty</system:String>
+        </collections:Hashtable>
+
+        <collections:Hashtable x:Key="PropertyTypeOptions">
+            <system:String x:Key="{x:Static common:PropertyType.Residential}">Residential</system:String>
+            <system:String x:Key="{x:Static common:PropertyType.Retail}">Retail</system:String>
+            <system:String x:Key="{x:Static common:PropertyType.Other}">Other</system:String>
+        </collections:Hashtable>
+
+        <collections:Hashtable x:Key="PaymentFrequencyOptions">
+            <system:String x:Key="{x:Static common:PaymentFrequency.Monthly}">Monthly</system:String>
+            <system:String x:Key="{x:Static common:PaymentFrequency.Quarterly}">Quarterly</system:String>
+            <system:String x:Key="{x:Static common:PaymentFrequency.Weekly}">Weekly</system:String>
+        </collections:Hashtable>
+
+        <local:HashtableConverter x:Key="PurchaseCostTypeConverter" ConversionTable="{StaticResource PurchaseCostTypeOptions}"/>
+
+        <local:BooleanInverter x:Key="BoolInverter"/>
+        <local:BoolVisibilityConverter x:Key="VisibleIfTrue"/>
+        <local:BoolVisibilityConverter x:Key="VisibleIfFalse" InvertLogic="True"/>
+        <local:NullVisibilityConverter x:Key="VisibleIfNotNull"/>
+        <local:NullVisibilityConverter x:Key="VisibleIfNull" InvertLogic="True"/>
+        <local:NonEmptyVisibilityConverter x:Key="VisibleIfNonEmpty"/>
+        <local:NonEmptyVisibilityConverter x:Key="VisibleIfEmpty" InvertLogic="True"/>
+        <local:NullOrEmptyVisibilityConverter x:Key="VisibleIfNotNullOrEmpty"/>
+        <local:DateBrushConverter x:Key="DateBrush" AmberThreshold="3" RedThreshold="1"/>
+
+        <BitmapImage x:Key="HouseImg" UriSource="pack://application:,,,/PropertyManagementUi;component/Images/house.png"/>
+        <BitmapImage x:Key="InsuranceIcon" UriSource="pack://application:,,,/PropertyManagementUi;component/Icons/insurance.png"/>
+        <BitmapImage x:Key="ElectricityIcon" UriSource="pack://application:,,,/PropertyManagementUi;component/Icons/electricity.png"/>
+        <BitmapImage x:Key="GasIcon" UriSource="pack://application:,,,/PropertyManagementUi;component/Icons/gas.png"/>
+        <BitmapImage x:Key="EnergyIcon" UriSource="pack://application:,,,/PropertyManagementUi;component/Icons/energy.png"/>
+        <BitmapImage x:Key="PlusIcon" UriSource="pack://application:,,,/PropertyManagementUi;component/Icons/plus.png"/>
+        <BitmapImage x:Key="RefreshIcon" UriSource="pack://application:,,,/PropertyManagementUi;component/Icons/refresh.png"/>
+        <BitmapImage x:Key="CrossIcon" UriSource="pack://application:,,,/PropertyManagementUi;component/Icons/cross.png"/>
+        <BitmapImage x:Key="TickIcon" UriSource="pack://application:,,,/PropertyManagementUi;component/Icons/tick.png"/>
+        <BitmapImage x:Key="AddUserIcon" UriSource="pack://application:,,,/PropertyManagementUi;component/Icons/add_user.png"/>
+        <BitmapImage x:Key="PencilIcon" UriSource="pack://application:,,,/PropertyManagementUi;component/Icons/pencil.png"/>
+        <BitmapImage x:Key="ViewDetailIcon" UriSource="pack://application:,,,/PropertyManagementUi;component/Icons/view_detail.png"/>
+
+        <SolidColorBrush x:Key="BtnMouseOverHighlight" Color="#50E0FF"/>
+        <SolidColorBrush x:Key="PanelBrush" Color="#E0E0E0"/>
+
+        <RadialGradientBrush x:Key="GreenRadial" Center="0.5,0.5" GradientOrigin="0.5,0.5">
+            <RadialGradientBrush.GradientStops>
+                <GradientStop Color="#50F000" Offset="0"/>
+                <GradientStop Color="#30C800" Offset="0.9"/>
+            </RadialGradientBrush.GradientStops>
+        </RadialGradientBrush>
+
+        <RadialGradientBrush x:Key="HighlightGreenRadial" Center="0.5,0.5" GradientOrigin="0.5,0.5">
+            <RadialGradientBrush.GradientStops>
+                <GradientStop Color="#B0FF30" Offset="0"/>
+                <GradientStop Color="#50E810" Offset="0.9"/>
+            </RadialGradientBrush.GradientStops>
+        </RadialGradientBrush>
+
+        <RadialGradientBrush x:Key="BlueRadial" Center="0.5,0.5" GradientOrigin="0.5,0.5">
+            <RadialGradientBrush.GradientStops>
+                <GradientStop Color="#3090FF" Offset="0"/>
+                <GradientStop Color="#1070D0" Offset="0.9"/>
+            </RadialGradientBrush.GradientStops>
+        </RadialGradientBrush>
+
+        <RadialGradientBrush x:Key="HighlightBlueRadial" Center="0.5,0.5" GradientOrigin="0.5,0.5">
+            <RadialGradientBrush.GradientStops>
+                <GradientStop Color="#60D0FF" Offset="0"/>
+                <GradientStop Color="#4090E8" Offset="0.9"/>
+            </RadialGradientBrush.GradientStops>
+        </RadialGradientBrush>
+
+        <RadialGradientBrush x:Key="RedRadial" Center="0.5,0.5" GradientOrigin="0.5,0.5">
+            <RadialGradientBrush.GradientStops>
+                <GradientStop Color="#FF0000" Offset="0"/>
+                <GradientStop Color="#D80000" Offset="0.9"/>
+            </RadialGradientBrush.GradientStops>
+        </RadialGradientBrush>
+
+        <RadialGradientBrush x:Key="HighlightRedRadial" Center="0.5,0.5" GradientOrigin="0.5,0.5">
+            <RadialGradientBrush.GradientStops>
+                <GradientStop Color="#FF7070" Offset="0"/>
+                <GradientStop Color="#F03030" Offset="0.9"/>
+            </RadialGradientBrush.GradientStops>
+        </RadialGradientBrush>
+
+        <Style x:Key="Link" TargetType="Button">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Grid>
+                            <ContentPresenter VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+
+            <Setter Property="ContentTemplate">
+                <Setter.Value>
+                    <DataTemplate>
+                        <TextBlock TextDecorations="Underline" Text="{TemplateBinding Content}"/>
+                    </DataTemplate>
+                </Setter.Value>
+            </Setter>
+
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+            <Setter Property="Foreground" Value="Blue"/>
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
+
+        <Style x:Key="AddButton" TargetType="local:CircularButton">
+            <Setter Property="HighlightStroke" Value="{StaticResource BtnMouseOverHighlight}"/>
+            <Setter Property="Background" Value="{StaticResource GreenRadial}"/>
+            <Setter Property="PressedBackground" Value="{StaticResource HighlightGreenRadial}"/>
+            <Setter Property="IconSource" Value="{StaticResource PlusIcon}"/>
+        </Style>
+
+        <Style x:Key="RefreshButton" TargetType="local:CircularButton">
+            <Setter Property="HighlightStroke" Value="{StaticResource BtnMouseOverHighlight}"/>
+            <Setter Property="Background" Value="{StaticResource BlueRadial}"/>
+            <Setter Property="PressedBackground" Value="{StaticResource HighlightBlueRadial}"/>
+            <Setter Property="IconSource" Value="{StaticResource RefreshIcon}"/>
+        </Style>
+
+        <Style x:Key="EditButton" TargetType="local:CircularButton">
+            <Setter Property="HighlightStroke" Value="{StaticResource BtnMouseOverHighlight}"/>
+            <Setter Property="Background" Value="{StaticResource BlueRadial}"/>
+            <Setter Property="PressedBackground" Value="{StaticResource HighlightBlueRadial}"/>
+            <Setter Property="IconSource" Value="{StaticResource PencilIcon}"/>
+        </Style>
+
+        <Style x:Key="OkButton" TargetType="local:CircularButton">
+            <Setter Property="HighlightStroke" Value="{StaticResource BtnMouseOverHighlight}"/>
+            <Setter Property="Background" Value="{StaticResource GreenRadial}"/>
+            <Setter Property="PressedBackground" Value="{StaticResource HighlightGreenRadial}"/>
+            <Setter Property="IconSource" Value="{StaticResource TickIcon}"/>
+        </Style>
+
+        <Style x:Key="RemoveButton" TargetType="local:CircularButton">
+            <Setter Property="HighlightStroke" Value="{StaticResource BtnMouseOverHighlight}"/>
+            <Setter Property="Background" Value="{StaticResource RedRadial}"/>
+            <Setter Property="PressedBackground" Value="{StaticResource HighlightRedRadial}"/>
+            <Setter Property="IconSource" Value="{StaticResource CrossIcon}"/>
+        </Style>
+
+        <Style x:Key="AddUserButton" TargetType="local:CircularButton">
+            <Setter Property="HighlightStroke" Value="{StaticResource BtnMouseOverHighlight}"/>
+            <Setter Property="Background" Value="{StaticResource BlueRadial}"/>
+            <Setter Property="PressedBackground" Value="{StaticResource HighlightBlueRadial}"/>
+            <Setter Property="IconSource" Value="{StaticResource AddUserIcon}"/>
+        </Style>
+
+        <Style x:Key="ViewDetailButton" TargetType="local:CircularButton">
+            <Setter Property="HighlightStroke" Value="{StaticResource BtnMouseOverHighlight}"/>
+            <Setter Property="Background" Value="{StaticResource BlueRadial}"/>
+            <Setter Property="PressedBackground" Value="{StaticResource HighlightBlueRadial}"/>
+            <Setter Property="IconSource" Value="{StaticResource ViewDetailIcon}"/>
+        </Style>
+
+        <Style x:Key="RoundedButtonBase" TargetType="local:RoundedButton">
+            <Setter Property="CornerRadius" Value="6"/>
+            <Setter Property="HighlightStrokeThickness" Value="2"/>
+            <Setter Property="HighlightStroke" Value="{StaticResource BtnMouseOverHighlight}"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="Padding" Value="4"/>
+        </Style>
+
+        <Style x:Key="GreenButton" TargetType="local:RoundedButton" BasedOn="{StaticResource RoundedButtonBase}">
+            <Setter Property="Background" Value="#20E222"/>
+            <Setter Property="PressedBackground" Value="#28F932"/>
+        </Style>
+
+        <Style x:Key="RedButton" TargetType="local:RoundedButton" BasedOn="{StaticResource RoundedButtonBase}">
+            <Setter Property="Background" Value="#E82020"/>
+            <Setter Property="PressedBackground" Value="#F93E3E"/>
+        </Style>
+
+        <Style x:Key="PageHeading" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="28"/>
+        </Style>
+
+        <Style x:Key="InfoPanel" TargetType="Border">
+            <Setter Property="Background" Value="{StaticResource PanelBrush}"/>
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="Padding" Value="12"/>
+        </Style>
+
+    </Application.Resources>
+    
+</Application>

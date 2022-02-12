@@ -1,0 +1,863 @@
+﻿<Page x:Class="PropertyManagementUi.PropertyDetailsPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:PropertyManagementUi"
+      mc:Ignorable="d" 
+      d:DesignHeight="800" d:DesignWidth="1300"
+      Title="Property Details Page">
+
+    <Page.Resources>
+        <Style x:Key="FlatTabControl" TargetType="TabControl">
+            <Setter Property="TabStripPlacement" Value="Top"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TabControl">
+
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+
+                            <TabPanel Grid.Row="0" x:Name="HeaderPanel" IsItemsHost="True" Margin="0 0 0 2"/>
+
+                            <ContentPresenter Grid.Row="1" x:Name="PART_SelectedContentHost" ContentSource="SelectedContent"/>
+                        </Grid>
+
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="FlatTabItem" TargetType="TabItem">
+            <Setter Property="HeaderTemplate">
+                <Setter.Value>
+                    <DataTemplate>
+                        <Border Name="ItemBorder" CornerRadius="4" Margin="2 0" Padding="8 4" Cursor="Hand">
+                            <ContentPresenter>
+                                <ContentPresenter.Content>
+                                    <TextBlock Name="Text" Text="{TemplateBinding Content}"/>
+                                </ContentPresenter.Content>
+                            </ContentPresenter>
+                        </Border>
+
+                        <DataTemplate.Triggers>
+                            <DataTrigger Binding="{Binding IsSelected, RelativeSource={RelativeSource AncestorType=TabItem}}" Value="True">
+                                <Setter TargetName="ItemBorder" Property="Background" Value="#ACACAC"/>
+                            </DataTrigger>
+
+                            <DataTrigger Binding="{Binding IsSelected, RelativeSource={RelativeSource AncestorType=TabItem}}" Value="False">
+                                <Setter TargetName="ItemBorder" Property="Background" Value="#C9C9C9"/>
+                            </DataTrigger>
+
+                            <DataTrigger Binding="{Binding IsEnabled, RelativeSource={RelativeSource AncestorType=TabItem}}" Value="False">
+                                <Setter TargetName="Text" Property="Foreground" Value="#909090"/>
+                            </DataTrigger>
+                        </DataTemplate.Triggers>
+
+                    </DataTemplate>
+                </Setter.Value>
+            </Setter>
+
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TabItem">
+                        <Grid>
+                            <ContentPresenter x:Name="ContentSite" ContentSource="Header" VerticalAlignment="Center" HorizontalAlignment="Center"
+                                                  RecognizesAccessKey="True"/>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Page.Resources>
+
+    <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+
+        <StackPanel MinWidth="1200" MaxWidth="1300" Margin="12">
+            <DockPanel Margin="0 0 0 12">
+                <local:RoundedButton DockPanel.Dock="Right" Background="#3070FF" PressedBackground="#4890FF" Foreground="White" CornerRadius="6"
+                                     HighlightStroke="{StaticResource BtnMouseOverHighlight}" HighlightStrokeThickness="2" Content="Edit" FontSize="16" Width="120"/>
+                <TextBlock Text="Property Details" Style="{StaticResource PageHeading}" Margin="0 0 16 0"/>
+                <Button Style="{StaticResource Link}" Click="BackLinkClick" Content="Back" FontSize="14" VerticalAlignment="Center"/>
+            </DockPanel>
+
+            <Grid Margin="0 0 0 12">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="300"/>
+                    <ColumnDefinition Width="3*"/>
+                    <ColumnDefinition Width="4*"/>
+                    <ColumnDefinition Width="4*"/>
+                </Grid.ColumnDefinitions>
+
+                <Border Grid.Column="0" Style="{StaticResource InfoPanel}" Margin="0 0 4 4">
+                    <Image Source="{StaticResource HouseImg}"/>
+                </Border>
+
+                <Grid Grid.Column="1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <Border Grid.Row="0" Style="{StaticResource InfoPanel}" Margin="4 0 4 4">
+
+                        <StackPanel>
+                            <DockPanel Margin="0 0 0 6">
+                                <TextBlock DockPanel.Dock="Right" FontSize="14" Text="Residential"/>
+                                <TextBlock VerticalAlignment="Center" FontWeight="Bold" Text="Property Type"/>
+                            </DockPanel>
+                            <DockPanel>
+                                <TextBlock DockPanel.Dock="Right" FontSize="14" Text="{Binding Owner}"/>
+                                <TextBlock VerticalAlignment="Center" FontWeight="Bold" Text="Owner"/>
+                            </DockPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Grid.Row="1" Style="{StaticResource InfoPanel}" Margin="4">
+                        <StackPanel>
+                            <TextBlock FontSize="16" Margin="0 0 0 6" Text="Address"/>
+                            <TextBlock Text="{Binding StreetAddress1}"/>
+                            <TextBlock Text="{Binding StreetAddress2}" Visibility="{Binding StreetAddress2, Converter={StaticResource VisibleIfNotNullOrEmpty}}"/>
+                            <TextBlock Text="{Binding Locality}" Visibility="{Binding Locality, Converter={StaticResource VisibleIfNotNullOrEmpty}}"/>
+                            <TextBlock Text="{Binding City}"/>
+                            <TextBlock Text="{Binding County}" Visibility="{Binding County, Converter={StaticResource VisibleIfNotNullOrEmpty}}"/>
+                            <TextBlock Text="{Binding Country}"/>
+                            <TextBlock Text="{Binding Postcode}"/>
+                        </StackPanel>
+                    </Border>
+
+                </Grid>
+
+                <Grid Grid.Column="2">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <Border Grid.Row="0" Style="{StaticResource InfoPanel}" Margin="4 0 4 4">
+                        <StackPanel>
+                            <DockPanel>
+                                <local:CircularButton DockPanel.Dock="Right" Click="AddTenancyButtonClick" Style="{StaticResource AddButton}"
+                                                Width="28" Height="28" Padding="6" HighlightStrokeThickness="1" ToolTip="Add Tenancy"/>
+                                <local:CircularButton DockPanel.Dock="Right" Click="TenancyDetailsButtonClick" Style="{StaticResource ViewDetailButton}"
+                                                      Height="24" Width="24" Padding="5" HighlightStrokeThickness="1" Margin="0 0 4 0" VerticalAlignment="Center" ToolTip="View Details"
+                                                      Visibility="{Binding CurrentTenancy, Converter={StaticResource VisibleIfNotNull}}"/>
+                                <TextBlock FontSize="18" Text="Current Tenants" Margin="0 0 0 6"/>
+                            </DockPanel>
+
+                            <Grid Visibility="{Binding CurrentTenancy, Converter={StaticResource VisibleIfNotNull}}">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="5*"/>
+                                    <ColumnDefinition Width="3*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" FontWeight="Bold" Text="Name" Grid.ColumnSpan="3" Margin="0,0,130,0"/>
+                                <TextBlock Grid.Column="1" FontWeight="Bold" Text="Telephone"/>
+                            </Grid>
+
+                            <ItemsControl ItemsSource="{Binding CurrentTenancy.Tenants}" Visibility="{Binding CurrentTenancy, Converter={StaticResource VisibleIfNotNull}}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel/>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="5*"/>
+                                                <ColumnDefinition Width="3*"/>
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Grid.Column="0" Text="{Binding Name}"/>
+                                            <TextBlock Grid.Column="1" Text="{Binding Telephone}"/>
+                                        </Grid>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Grid.Row="1" Style="{StaticResource InfoPanel}" Margin="4">
+                        <StackPanel>
+                            <DockPanel Margin="0 0 0 4">
+                                <TextBlock DockPanel.Dock="Right" FontSize="16" Text="{Binding CurrentTenancy.StartDate, StringFormat='dd MMMM yyyy', FallbackValue='N/A'}"/>
+                                <TextBlock FontWeight="Bold" VerticalAlignment="Center" Text="Tenancy Start"/>
+                            </DockPanel>
+
+                            <DockPanel>
+                                <TextBlock DockPanel.Dock="Right" FontSize="16" Text="{Binding CurrentTenancy.EndDate, StringFormat='dd MMMM yyyy', FallbackValue='N/A'}"/>
+                                <TextBlock FontWeight="Bold" VerticalAlignment="Center" Text="Tenancy End"/>
+                            </DockPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Grid.Row="2" Style="{StaticResource InfoPanel}" Margin="4">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel Grid.Column="0">
+                                <TextBlock FontWeight="Bold" Text="Outstanding Balance"/>
+                                <TextBlock Margin="0 0 0 4" FontSize="18" Text="{Binding CurrentTenancy.OutstandingBalance, StringFormat='£##,#.00;-£##,#.00;NIL', FallbackValue='N/A'}"/>
+                                <Button Style="{StaticResource Link}" Content="View Account" Margin="0 0 0 2"/>
+                                <Button Style="{StaticResource Link}" Content="Add Payment"/>
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="1">
+                                <TextBlock FontWeight="Bold" Text="Next Payment Due"/>
+                                <TextBlock FontSize="18" Text="{Binding CurrentTenancy.NextPaymentDue, StringFormat='dd MMMM', FallbackValue='N/A', TargetNullValue='N/A'}"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                </Grid>
+
+                <Grid Grid.Column="3">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <Border Grid.Row="0" Style="{StaticResource InfoPanel}" Margin="4 0 0 4">
+
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel Grid.Column="0">
+                                <TextBlock FontWeight="Bold" Text="Purchase Date"/>
+                                <TextBlock FontSize="16" Text="{Binding PurchaseDate, StringFormat='dd MMMM yyyy'}"/>
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="1">
+                                <TextBlock FontWeight="Bold" Text="Purchase Price"/>
+                                <TextBlock FontSize="16" Text="{Binding PurchasePrice, StringFormat='£##,#.00'}"/>
+                            </StackPanel>
+                        </Grid>
+
+                    </Border>
+
+                    <Border Grid.Row="1" Style="{StaticResource InfoPanel}" Margin="4 4 0 4">
+                        <StackPanel>
+                            <TextBlock FontSize="18" Text="Purchase Costs"/>
+
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="5*"/>
+                                    <ColumnDefinition Width="3*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <TextBlock Grid.Column="0" FontWeight="Bold" Text="Type"/>
+                                <TextBlock Grid.Column="1" FontWeight="Bold" Text="Amount"/>
+
+                            </Grid>
+
+                            <ItemsControl ItemsSource="{Binding PurchaseCosts}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel/>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="5*"/>
+                                                <ColumnDefinition Width="3*"/>
+                                            </Grid.ColumnDefinitions>
+
+                                            <TextBlock Grid.Column="0" Text="{Binding Type, Converter={StaticResource PurchaseCostTypeConverter}}"/>
+                                            <TextBlock Grid.Column="1" Text="{Binding Amount, StringFormat='£##,#.00'}"/>
+
+                                        </Grid>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </Grid>
+
+
+            <Grid MaxHeight="360">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="4*"/>
+                    <ColumnDefinition Width="4*"/>
+                    <ColumnDefinition Width="7*"/>
+                </Grid.ColumnDefinitions>
+
+                <Border Grid.Column="0" Style="{StaticResource InfoPanel}" Margin="4 4 4 0">
+
+                    <StackPanel>
+
+                        <DockPanel Margin="0 0 0 4" Visibility="{Binding AddingInsurance, RelativeSource={RelativeSource AncestorType=Page}, Converter={StaticResource VisibleIfFalse}}">
+                            <local:CircularButton DockPanel.Dock="Right" Click="AddInsuranceButtonClick" Style="{StaticResource AddButton}"
+                                                Width="28" Height="28" HighlightStrokeThickness="1" Padding="6" ToolTip="Add Insurance"/>
+                            <TextBlock VerticalAlignment="Center" FontSize="18" Text="Insurance"/>
+                        </DockPanel>
+
+                        <TextBlock Margin="0 4 0 0" FontSize="18" FontWeight="Bold" Foreground="Red" Text="NO INSURANCE" HorizontalAlignment="Center"
+                                    Visibility="{Binding ShowNoInsuranceText, RelativeSource={RelativeSource AncestorType=Page}, Converter={StaticResource VisibleIfTrue}}"/>
+
+                        <StackPanel DataContext="{Binding Insurance}"
+                                    Visibility="{Binding ShowInsuranceDetails, RelativeSource={RelativeSource AncestorType=Page}, Converter={StaticResource VisibleIfTrue}}">
+                            <DockPanel Margin="0 0 0 4">
+                                <TextBlock DockPanel.Dock="Right" FontSize="16" Text="{Binding StartDate, StringFormat='dd MMMM yyyy'}"/>
+                                <TextBlock VerticalAlignment="Center" FontWeight="Bold" Text="Start Date"/>
+                            </DockPanel>
+
+                            <DockPanel Margin="0 0 0 4">
+                                <TextBlock DockPanel.Dock="Right" FontSize="16" Text="{Binding EndDate, StringFormat='dd MMMM yyyy'}"/>
+                                <TextBlock VerticalAlignment="Center" FontWeight="Bold" Text="End Date"/>
+                            </DockPanel>
+
+                            <TextBlock Margin="0 0 0 2" FontSize="18" Text="Insurer"/>
+                            <DockPanel Margin="0 0 0 4">
+                                <TextBlock DockPanel.Dock="Right" FontSize="14" Text="{Binding Insurer.Name}"/>
+                                <TextBlock VerticalAlignment="Center" FontWeight="Bold" Text="Name"/>
+                            </DockPanel>
+                            <DockPanel Margin="0 0 0 4">
+                                <TextBlock DockPanel.Dock="Right" FontSize="14" Text="{Binding Insurer.Telephone}"/>
+                                <TextBlock VerticalAlignment="Center" FontWeight="Bold" Text="Telephone"/>
+                            </DockPanel>
+                            <DockPanel Margin="0 0 0 4">
+                                <TextBlock DockPanel.Dock="Right" Text="{Binding Insurer.Email}"/>
+                                <TextBlock VerticalAlignment="Center" FontWeight="Bold" Text="Email"/>
+                            </DockPanel>
+
+                            <TextBlock Margin="0 0 0 2" FontSize="18" Text="Broker"/>
+                            <DockPanel Margin="0 0 0 4">
+                                <TextBlock DockPanel.Dock="Right" FontSize="14" Text="{Binding Broker.Name}"/>
+                                <TextBlock VerticalAlignment="Center" FontWeight="Bold" Text="Name"/>
+                            </DockPanel>
+                            <DockPanel Margin="0 0 0 4">
+                                <TextBlock DockPanel.Dock="Right" FontSize="14" Text="{Binding Broker.Telephone}"/>
+                                <TextBlock VerticalAlignment="Center" FontWeight="Bold" Text="Telephone"/>
+                            </DockPanel>
+                            <DockPanel Margin="0 0 0 4">
+                                <TextBlock DockPanel.Dock="Right" Text="{Binding Broker.Email}"/>
+                                <TextBlock VerticalAlignment="Center" FontWeight="Bold" Text="Email"/>
+                            </DockPanel>
+                        </StackPanel>
+
+                        <StackPanel DataContext="{Binding NewInsurance, Mode=TwoWay}" Visibility="{Binding AddingInsurance, RelativeSource={RelativeSource AncestorType=Page}, Converter={StaticResource VisibleIfTrue}}">
+                            <DockPanel Margin="0 0 0 6">
+                                <local:CircularButton DockPanel.Dock="Right" Click="AddInsuranceCancelButtonClick" Style="{StaticResource RemoveButton}" Width="20" Height="20" HighlightStrokeThickness="1"
+                                        Padding="4" ToolTip="Cancel"/>
+                                <local:CircularButton DockPanel.Dock="Right" Click="AddInsuranceOkButtonClick" Style="{StaticResource OkButton}" Width="20" Height="20" HighlightStrokeThickness="1"
+                                        Padding="4" Margin="0 0 4 0" ToolTip="OK"/>
+                                <TextBlock FontSize="18" Text="Insurance"/>
+                            </DockPanel>
+
+                            <DockPanel Margin="0 0 0 4">
+                                <DatePicker DockPanel.Dock="Right" Width="212" VerticalAlignment="Center" SelectedDate="{Binding StartDate, Mode=TwoWay}"/>
+                                <TextBlock VerticalAlignment="Center" FontWeight="Bold" Text="Start Date"/>
+                            </DockPanel>
+
+                            <DockPanel Margin="0 0 0 4">
+                                <DatePicker DockPanel.Dock="Right" Width="212" VerticalAlignment="Center" SelectedDate="{Binding EndDate, Mode=TwoWay}"/>
+                                <TextBlock VerticalAlignment="Center" FontWeight="Bold" Text="End Date"/>
+                            </DockPanel>
+
+                            <DockPanel Margin="0 0 0 4" Visibility="{Binding AddingInsurer, RelativeSource={RelativeSource AncestorType=Page}, Converter={StaticResource VisibleIfFalse}}">
+                                <local:CircularButton DockPanel.Dock="Right" Click="AddInsurerButtonClick" Style="{StaticResource AddUserButton}" Width="28" Height="28" HighlightStrokeThickness="1"
+                                                    Padding="6" ToolTip="Add New Insurer"/>
+                                <ComboBox DockPanel.Dock="Right" Width="180" Margin="0 0 4 0" ItemsSource="{Binding Insurers}" SelectedItem="{Binding Insurer, Mode=TwoWay}"
+                                        DisplayMemberPath="Name"/>
+                                <TextBlock FontWeight="Bold" VerticalAlignment="Center" Text="Insurer"/>
+                            </DockPanel>
+
+                            <StackPanel Margin="0 0 0 4" Visibility="{Binding AddingInsurer, RelativeSource={RelativeSource AncestorType=Page}, Converter={StaticResource VisibleIfTrue}}"
+                                    DataContext="{Binding NewInsurer, Mode=TwoWay}">
+                                <DockPanel Margin="0 4 0 4">
+                                    <local:CircularButton DockPanel.Dock="Right" Click="AddInsurerCancelButtonClick" Style="{StaticResource RemoveButton}" Width="20" Height="20" HighlightStrokeThickness="1"
+                                        Padding="4" ToolTip="Cancel"/>
+                                    <local:CircularButton DockPanel.Dock="Right" Click="AddInsurerOkButtonClick" Style="{StaticResource OkButton}" Width="20" Height="20" HighlightStrokeThickness="1"
+                                        Padding="4" Margin="0 0 4 0" ToolTip="OK"/>
+                                    <TextBlock FontSize="18" Text="Insurer"/>
+                                </DockPanel>
+                                <DockPanel Margin="0 0 0 4">
+                                    <TextBox DockPanel.Dock="Right" Width="212" Text="{Binding Name, Mode=TwoWay}"/>
+                                    <TextBlock VerticalAlignment="Center" FontWeight="Bold" Text="Name"/>
+                                </DockPanel>
+                                <DockPanel Margin="0 0 0 4">
+                                    <TextBox DockPanel.Dock="Right" Width="212" Text="{Binding Telephone, Mode=TwoWay}"/>
+                                    <TextBlock VerticalAlignment="Center" FontWeight="Bold" Text="Telephone"/>
+                                </DockPanel>
+                                <DockPanel Margin="0 0 0 4">
+                                    <TextBox DockPanel.Dock="Right" Width="212" Text="{Binding Email, Mode=TwoWay}"/>
+                                    <TextBlock VerticalAlignment="Center" FontWeight="Bold" Text="Email"/>
+                                </DockPanel>
+                            </StackPanel>
+
+                            <DockPanel Margin="0 0 0 4" Visibility="{Binding AddingBroker, RelativeSource={RelativeSource AncestorType=Page}, Converter={StaticResource VisibleIfFalse}}">
+                                <local:CircularButton DockPanel.Dock="Right" Click="AddBrokerButtonClick" Style="{StaticResource AddUserButton}" Width="28" Height="28" HighlightStrokeThickness="1"
+                                                    Padding="6" ToolTip="Add New Broker"/>
+                                <ComboBox DockPanel.Dock="Right" Width="180" Margin="0 0 4 0" ItemsSource="{Binding Brokers}" SelectedItem="{Binding Broker, Mode=TwoWay}"
+                                        DisplayMemberPath="Name"/>
+                                <TextBlock FontWeight="Bold" VerticalAlignment="Center" Text="Broker"/>
+                            </DockPanel>
+
+                            <StackPanel Margin="0 0 0 4" Visibility="{Binding AddingBroker, RelativeSource={RelativeSource AncestorType=Page}, Converter={StaticResource VisibleIfTrue}}"
+                                    DataContext="{Binding NewBroker, Mode=TwoWay}">
+                                <DockPanel Margin="0 4 0 4">
+                                    <local:CircularButton DockPanel.Dock="Right" Click="AddBrokerCancelButtonClick" Style="{StaticResource RemoveButton}" Width="20" Height="20" HighlightStrokeThickness="1"
+                                        Padding="4" ToolTip="Cancel"/>
+                                    <local:CircularButton DockPanel.Dock="Right" Click="AddBrokerOkButtonClick" Style="{StaticResource OkButton}" Width="20" Height="20" HighlightStrokeThickness="1"
+                                        Padding="4" Margin="0 0 4 0" ToolTip="OK"/>
+                                    <TextBlock FontSize="18" Text="Broker"/>
+                                </DockPanel>
+                                <DockPanel Margin="0 0 0 4">
+                                    <TextBox DockPanel.Dock="Right" Width="212" Text="{Binding Name, Mode=TwoWay}"/>
+                                    <TextBlock VerticalAlignment="Center" FontWeight="Bold" Text="Name"/>
+                                </DockPanel>
+                                <DockPanel Margin="0 0 0 4">
+                                    <TextBox DockPanel.Dock="Right" Width="212" Text="{Binding Telephone, Mode=TwoWay}"/>
+                                    <TextBlock VerticalAlignment="Center" FontWeight="Bold" Text="Telephone"/>
+                                </DockPanel>
+                                <DockPanel Margin="0 0 0 4">
+                                    <TextBox DockPanel.Dock="Right" Width="212" Text="{Binding Email, Mode=TwoWay}"/>
+                                    <TextBlock VerticalAlignment="Center" FontWeight="Bold" Text="Email"/>
+                                </DockPanel>
+                            </StackPanel>
+                        </StackPanel>
+
+                    </StackPanel>
+
+                </Border>
+
+                <Grid Grid.Column="1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <Border Grid.Row="0" Style="{StaticResource InfoPanel}" Margin="4">
+
+                        <StackPanel>
+
+                            <DockPanel Margin="0 0 0 4" Visibility="{Binding AddingElectricalCertificate, RelativeSource={RelativeSource AncestorType=Page}, Converter={StaticResource VisibleIfFalse}}">
+                                <local:CircularButton DockPanel.Dock="Right" Style="{StaticResource AddButton}" Click="AddElectricalCertificateButtonClick"
+                                                          Width="28" Height="28" HighlightStrokeThickness="1" Padding="6" ToolTip="Add New Electrical Inspection Certificate"/>
+                                <TextBlock VerticalAlignment="Center" FontSize="18" Text="Electrical Inspection Certificate"/>
+                            </DockPanel>
+
+                            <TextBlock FontSize="18" FontWeight="Bold" Foreground="Red" Text="NO CERTIFICATE" HorizontalAlignment="Center"
+                                    Visibility="{Binding ShowNoElectricalCertificateText, RelativeSource={RelativeSource AncestorType=Page}, Converter={StaticResource VisibleIfTrue}}"/>
+
+                            <StackPanel Visibility="{Binding ShowElectricalCertificateDetails, RelativeSource={RelativeSource AncestorType=Page}, Converter={StaticResource VisibleIfTrue}}"
+                                        DataContext="{Binding ElectricalInspectionCertificate}">
+                                <DockPanel Margin="0 0 0 4">
+                                    <TextBlock DockPanel.Dock="Right" FontSize="16" Text="{Binding IssueDate, StringFormat='dd MMMM yyyy'}"/>
+                                    <TextBlock VerticalAlignment="Center" FontWeight="Bold" Text="Issue Date"/>
+                                </DockPanel>
+                                <DockPanel Margin="0 0 0 4">
+                                    <TextBlock DockPanel.Dock="Right" FontSize="16" Text="{Binding ExpiryDate, StringFormat='dd MMMM yyyy'}"/>
+                                    <TextBlock VerticalAlignment="Center" FontWeight="Bold" Text="Renewal Date"/>
+                                </DockPanel>
+                            </StackPanel>
+
+                            <StackPanel Visibility="{Binding AddingElectricalCertificate, RelativeSource={RelativeSource AncestorType=Page}, Converter={StaticResource VisibleIfTrue}}"
+                                        DataContext="{Binding NewElectricalInspectionCertificate}">
+                                <DockPanel Margin="0 0 0 4">
+                                    <local:CircularButton DockPanel.Dock="Right" Click="AddElectricalCertificateCancelButtonClick" Style="{StaticResource RemoveButton}" Width="20" Height="20" HighlightStrokeThickness="1"
+                                                Padding="4" ToolTip="Cancel"/>
+                                    <local:CircularButton DockPanel.Dock="Right" Click="AddElectricalCertificateOkButtonClick" Style="{StaticResource OkButton}" Width="20" Height="20" HighlightStrokeThickness="1"
+                                                Padding="4" Margin="0 0 4 0" ToolTip="OK"/>
+                                    <TextBlock FontSize="18" Text="Electrical Inspection Certificate"/>
+                                </DockPanel>
+
+                                <DockPanel Margin="0 0 0 4">
+                                    <DatePicker DockPanel.Dock="Right" Width="180" SelectedDate="{Binding IssueDate, Mode=TwoWay}"/>
+                                    <TextBlock VerticalAlignment="Center" FontWeight="Bold" Text="Issue Date"/>
+                                </DockPanel>
+                                <DockPanel Margin="0 0 0 4">
+                                    <DatePicker DockPanel.Dock="Right" Width="180" SelectedDate="{Binding ExpiryDate, Mode=TwoWay}"/>
+                                    <TextBlock VerticalAlignment="Center" FontWeight="Bold" Text="Renewal Date"/>
+                                </DockPanel>
+                            </StackPanel>
+
+                        </StackPanel>
+                    </Border>
+
+                    <Border Grid.Row="1" Style="{StaticResource InfoPanel}" Margin="4">
+                        <StackPanel>
+
+                            <DockPanel Margin="0 0 0 4" Visibility="{Binding AddingGasCertificate, RelativeSource={RelativeSource AncestorType=Page}, Converter={StaticResource VisibleIfFalse}}">
+                                <local:CircularButton DockPanel.Dock="Right" Style="{StaticResource AddButton}" Click="AddGasCertificateButtonClick"
+                                                          Width="28" Height="28" HighlightStrokeThickness="1" Padding="6" ToolTip="Add New Gas Safety Certificate"/>
+                                <TextBlock VerticalAlignment="Center" FontSize="18" Text="Gas Safety Certificate"/>
+                            </DockPanel>
+
+                            <TextBlock FontSize="18" FontWeight="Bold" Foreground="Red" Text="NO CERTIFICATE" HorizontalAlignment="Center"
+                                    Visibility="{Binding ShowNoGasCertificateText, RelativeSource={RelativeSource AncestorType=Page}, Converter={StaticResource VisibleIfTrue}}"/>
+
+                            <StackPanel Visibility="{Binding ShowGasCertificateDetails, RelativeSource={RelativeSource AncestorType=Page}, Converter={StaticResource VisibleIfTrue}}"
+                                        DataContext="{Binding GasSafetyCertificate}">
+
+                                <DockPanel Margin="0 0 0 4">
+                                    <TextBlock DockPanel.Dock="Right" FontSize="16" Text="{Binding IssueDate, StringFormat='dd MMMM yyyy'}"/>
+                                    <TextBlock VerticalAlignment="Center" FontWeight="Bold" Text="Issue Date"/>
+                                </DockPanel>
+                                <DockPanel Margin="0 0 0 4">
+                                    <TextBlock DockPanel.Dock="Right" FontSize="16" Text="{Binding ExpiryDate, StringFormat='dd MMMM yyyy'}"/>
+                                    <TextBlock VerticalAlignment="Center" FontWeight="Bold" Text="Renewal Date"/>
+                                </DockPanel>
+                            </StackPanel>
+
+                            <StackPanel Visibility="{Binding AddingGasCertificate, RelativeSource={RelativeSource AncestorType=Page}, Converter={StaticResource VisibleIfTrue}}"
+                                        DataContext="{Binding NewGasSafetyCertificate}">
+                                <DockPanel Margin="0 0 0 4">
+                                    <local:CircularButton DockPanel.Dock="Right" Click="AddGasCertificateCancelButtonClick" Style="{StaticResource RemoveButton}" Width="20" Height="20" HighlightStrokeThickness="1"
+                                                Padding="4" ToolTip="Cancel"/>
+                                    <local:CircularButton DockPanel.Dock="Right" Click="AddGasCertificateOkButtonClick" Style="{StaticResource OkButton}" Width="20" Height="20" HighlightStrokeThickness="1"
+                                                Padding="4" Margin="0 0 4 0" ToolTip="OK"/>
+                                    <TextBlock FontSize="18" Text="Gas Safety Certificate"/>
+                                </DockPanel>
+
+                                <DockPanel Margin="0 0 0 4">
+                                    <DatePicker DockPanel.Dock="Right" Width="180" SelectedDate="{Binding IssueDate, Mode=TwoWay}"/>
+                                    <TextBlock VerticalAlignment="Center" FontWeight="Bold" Text="Issue Date"/>
+                                </DockPanel>
+                                <DockPanel Margin="0 0 0 4">
+                                    <DatePicker DockPanel.Dock="Right" Width="180" SelectedDate="{Binding ExpiryDate, Mode=TwoWay}"/>
+                                    <TextBlock VerticalAlignment="Center" FontWeight="Bold" Text="Renewal Date"/>
+                                </DockPanel>
+                            </StackPanel>
+
+                        </StackPanel>
+                    </Border>
+
+                    <Border Grid.Row="2" Style="{StaticResource InfoPanel}" Margin="4 4 4 0">
+                        <StackPanel>
+
+                            <DockPanel Margin="0 0 0 4" Visibility="{Binding AddingEnergyCertificate, RelativeSource={RelativeSource AncestorType=Page}, Converter={StaticResource VisibleIfFalse}}">
+                                <local:CircularButton DockPanel.Dock="Right" Style="{StaticResource AddButton}" Click="AddEnergyCertificateButtonClick"
+                                                          Width="28" Height="28" HighlightStrokeThickness="1" Padding="6" ToolTip="Add New Energy Performance Certificate"/>
+                                <TextBlock VerticalAlignment="Center" FontSize="18" Text="Energy Performance Certificate"/>
+                            </DockPanel>
+
+                            <TextBlock FontSize="18" FontWeight="Bold" Foreground="Red" Text="NO CERTIFICATE" HorizontalAlignment="Center"
+                                    Visibility="{Binding ShowNoEnergyCertificateText, RelativeSource={RelativeSource AncestorType=Page}, Converter={StaticResource VisibleIfTrue}}"/>
+
+                            <StackPanel Visibility="{Binding ShowEnergyCertificateDetails, RelativeSource={RelativeSource AncestorType=Page}, Converter={StaticResource VisibleIfTrue}}"
+                                        DataContext="{Binding EnergyPerformanceCertificate}">
+                                <DockPanel Margin="0 0 0 4">
+                                    <TextBlock DockPanel.Dock="Right" FontSize="16" Text="{Binding IssueDate, StringFormat='dd MMMM yyyy'}"/>
+                                    <TextBlock VerticalAlignment="Center" FontWeight="Bold" Text="Issue Date"/>
+                                </DockPanel>
+                                <DockPanel Margin="0 0 0 4">
+                                    <TextBlock DockPanel.Dock="Right" FontSize="16" Text="{Binding ExpiryDate, StringFormat='dd MMMM yyyy'}"/>
+                                    <TextBlock VerticalAlignment="Center" FontWeight="Bold" Text="Renewal Date"/>
+                                </DockPanel>
+                            </StackPanel>
+
+                            <StackPanel Visibility="{Binding AddingEnergyCertificate, RelativeSource={RelativeSource AncestorType=Page}, Converter={StaticResource VisibleIfTrue}}"
+                                        DataContext="{Binding NewEnergyPerformanceCertificate}">
+                                <DockPanel Margin="0 0 0 4">
+                                    <local:CircularButton DockPanel.Dock="Right" Click="AddEnergyCertificateCancelButtonClick" Style="{StaticResource RemoveButton}" Width="20" Height="20" HighlightStrokeThickness="1"
+                                                Padding="4" ToolTip="Cancel"/>
+                                    <local:CircularButton DockPanel.Dock="Right" Click="AddEnergyCertificateOkButtonClick" Style="{StaticResource OkButton}" Width="20" Height="20" HighlightStrokeThickness="1"
+                                                Padding="4" Margin="0 0 4 0" ToolTip="OK"/>
+                                    <TextBlock FontSize="18" Text="Energy Performance Certificate"/>
+                                </DockPanel>
+
+                                <DockPanel Margin="0 0 0 4">
+                                    <DatePicker DockPanel.Dock="Right" Width="180" SelectedDate="{Binding IssueDate, Mode=TwoWay}"/>
+                                    <TextBlock VerticalAlignment="Center" FontWeight="Bold" Text="Issue Date"/>
+                                </DockPanel>
+                                <DockPanel Margin="0 0 0 4">
+                                    <DatePicker DockPanel.Dock="Right" Width="180" SelectedDate="{Binding ExpiryDate, Mode=TwoWay}"/>
+                                    <TextBlock VerticalAlignment="Center" FontWeight="Bold" Text="Renewal Date"/>
+                                </DockPanel>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+
+                <Border Grid.Column="2" Style="{StaticResource InfoPanel}" Margin="4 4 0 0">
+                    <TabControl Style="{StaticResource FlatTabControl}">
+                        <TabItem Style="{StaticResource FlatTabItem}" Header="Expenses" IsEnabled="{Binding AddingOrEditingImprovements, RelativeSource={RelativeSource AncestorType=Page}, Converter={StaticResource BoolInverter}}">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+
+                                <DockPanel Grid.Row="0" Margin="0 0 0 2" Visibility="{Binding AddingOrEditingExpenses, RelativeSource={RelativeSource AncestorType=Page}, Converter={StaticResource VisibleIfFalse}}">
+                                    <local:CircularButton DockPanel.Dock="Right" Style="{StaticResource AddButton}" Height="28" Width="28" Padding="6"
+                                                          HighlightStroke="{StaticResource BtnMouseOverHighlight}" HighlightStrokeThickness="1" Click="AddExpenseButtonClick" ToolTip="Add Expense"/>
+                                    <local:CircularButton DockPanel.Dock="Right" Style="{StaticResource EditButton}" Height="24" Width="24" Padding="6" Margin="0 0 4 0"
+                                                          HighlightStroke="{StaticResource BtnMouseOverHighlight}" HighlightStrokeThickness="1" Click="EditExpensesButtonClick" ToolTip="Edit"/>
+                                    <TextBlock FontSize="18" Text="Expenses" VerticalAlignment="Center" Margin="0 0 6 0"/>
+                                </DockPanel>
+
+                                <DockPanel Grid.Row="0" Margin="0 0 0 2" Visibility="{Binding AddingExpense, RelativeSource={RelativeSource AncestorType=Page}, Converter={StaticResource VisibleIfTrue}}">
+                                    <local:CircularButton DockPanel.Dock="Right" Style="{StaticResource RemoveButton}" Height="20" Width="20" Padding="4"
+                                                          HighlightStroke="{StaticResource BtnMouseOverHighlight}" HighlightStrokeThickness="1" Click="AddExpenseCancelButtonClick"
+                                                          ToolTip="Cancel"/>
+                                    <local:CircularButton DockPanel.Dock="Right" Style="{StaticResource OkButton}" Height="20" Width="20" Padding="4" Margin="0 0 4 0"
+                                                          HighlightStroke="{StaticResource BtnMouseOverHighlight}" HighlightStrokeThickness="1" Click="AddExpenseOkButtonClick"
+                                                          ToolTip="OK"/>
+                                    <TextBlock FontSize="18" Text="Expenses" VerticalAlignment="Center" Margin="0 0 6 0"/>
+                                </DockPanel>
+
+                                <DockPanel Grid.Row="0" Margin="0 0 0 2" Visibility="{Binding EditingExpenses, RelativeSource={RelativeSource AncestorType=Page}, Converter={StaticResource VisibleIfTrue}}">
+                                    <local:CircularButton DockPanel.Dock="Right" Style="{StaticResource RemoveButton}" Height="20" Width="20" Padding="4" HighlightStroke="{StaticResource BtnMouseOverHighlight}"
+                                                          HighlightStrokeThickness="1" Click="EditExpensesCancelButtonClick" ToolTip="Discard Changes"/>
+                                    <local:CircularButton DockPanel.Dock="Right" Style="{StaticResource OkButton}" Height="20" Width="20" Padding="4" Margin="0 0 4 0"
+                                                          HighlightStroke="{StaticResource BtnMouseOverHighlight}" HighlightStrokeThickness="1" Click="EditExpensesOkButtonClick"
+                                                          ToolTip="Save Changes"/>
+                                    <TextBlock FontSize="18" Text="Expenses" VerticalAlignment="Center" Margin="0 0 6 0"/>
+                                </DockPanel>
+
+                                <Grid Grid.Row="1" Margin="0 0 0 2" Visibility="{Binding EditingExpenses, RelativeSource={RelativeSource AncestorType=Page}, Converter={StaticResource VisibleIfFalse}}">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="3*"/>
+                                        <ColumnDefinition Width="10*"/>
+                                        <ColumnDefinition Width="3*"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <TextBlock Grid.Column="0" FontWeight="Bold" Text="Date"/>
+                                    <TextBlock Grid.Column="1" FontWeight="Bold" Text="Description"/>
+                                    <TextBlock Grid.Column="2" FontWeight="Bold" Text="Amount"/>
+                                </Grid>
+
+                                <Grid Grid.Row="1" Margin="0 0 0 2" Visibility="{Binding EditingExpenses, RelativeSource={RelativeSource AncestorType=Page}, Converter={StaticResource VisibleIfTrue}}">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="3*"/>
+                                        <ColumnDefinition Width="10*"/>
+                                        <ColumnDefinition Width="3*"/>
+                                        <ColumnDefinition Width="24"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <TextBlock Grid.Column="0" FontWeight="Bold" Text="Date"/>
+                                    <TextBlock Grid.Column="1" FontWeight="Bold" Text="Description"/>
+                                    <TextBlock Grid.Column="2" FontWeight="Bold" Text="Amount"/>
+                                </Grid>
+
+                                <ScrollViewer Grid.Row="2" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                                    <StackPanel>
+                                        <Grid Margin="0 0 0 2" Visibility="{Binding AddingExpense, RelativeSource={RelativeSource AncestorType=Page}, Converter={StaticResource VisibleIfTrue}}">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="3*"/>
+                                                <ColumnDefinition Width="10*"/>
+                                                <ColumnDefinition Width="3*"/>
+                                            </Grid.ColumnDefinitions>
+
+                                            <DatePicker Grid.Column="0" Margin="0 0 4 0" SelectedDate="{Binding NewExpense.Date, Mode=TwoWay}"/>
+                                            <TextBox Grid.Column="1" Margin="0 0 4 0" Text="{Binding NewExpense.Description, Mode=TwoWay}"/>
+                                            <TextBox Grid.Column="2" Text="{Binding NewExpense.Amount, Mode=TwoWay}"/>
+                                        </Grid>
+
+                                        <ItemsControl ItemsSource="{Binding Expenses}" Visibility="{Binding EditingExpenses, RelativeSource={RelativeSource AncestorType=Page}, Converter={StaticResource VisibleIfFalse}}">
+                                            <ItemsControl.ItemsPanel>
+                                                <ItemsPanelTemplate>
+                                                    <StackPanel/>
+                                                </ItemsPanelTemplate>
+                                            </ItemsControl.ItemsPanel>
+
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <Grid Margin="0 0 0 2">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="3*"/>
+                                                            <ColumnDefinition Width="10*"/>
+                                                            <ColumnDefinition Width="3*"/>
+                                                        </Grid.ColumnDefinitions>
+
+                                                        <TextBlock Grid.Column="0" Text="{Binding Date, StringFormat='dd/MM/yy'}"/>
+                                                        <TextBlock Grid.Column="1" Text="{Binding Description}"/>
+                                                        <TextBlock Grid.Column="2" Text="{Binding Amount, StringFormat='£##,#.00;-£##,#.00;NIL'}"/>
+                                                    </Grid>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+
+                                        <ItemsControl ItemsSource="{Binding ExpensesForEdit}" Visibility="{Binding EditingExpenses, RelativeSource={RelativeSource AncestorType=Page}, Converter={StaticResource VisibleIfTrue}}">
+                                            <ItemsControl.ItemsPanel>
+                                                <ItemsPanelTemplate>
+                                                    <StackPanel/>
+                                                </ItemsPanelTemplate>
+                                            </ItemsControl.ItemsPanel>
+
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <Grid Margin="0 0 0 4">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="3*"/>
+                                                            <ColumnDefinition Width="10*"/>
+                                                            <ColumnDefinition Width="3*"/>
+                                                            <ColumnDefinition Width="24"/>
+                                                        </Grid.ColumnDefinitions>
+
+                                                        <DatePicker Grid.Column="0" SelectedDate="{Binding Date, Mode=TwoWay}" Tag="{Binding}" Margin="0 0 4 0"
+                                                                    SelectedDateChanged="ExpenseDateChanged"/>
+                                                        <TextBox Grid.Column="1" Text="{Binding Description, Mode=TwoWay}" Tag="{Binding}"  Margin="0 0 4 0"
+                                                                 TextChanged="ExpenseDescriptionChanged"/>
+                                                        <TextBox Grid.Column="2" Text="{Binding Amount, Mode=TwoWay}" Tag="{Binding}"
+                                                                 TextChanged="ExpenseAmountChanged"/>
+
+                                                        <local:CircularButton Grid.Column="3" Style="{StaticResource RemoveButton}" Width="20" Height="20" Padding="4"
+                                                                              HighlightStroke="{StaticResource BtnMouseOverHighlight}"
+                                                                              HighlightStrokeThickness="1" Margin="4 0 0 0" ToolTip="Delete" Tag="{Binding}"
+                                                                              Click="DeleteExpenseButtonClick"/>
+                                                    </Grid>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </StackPanel>
+                                </ScrollViewer>
+                            </Grid>
+                        </TabItem>
+
+                        <TabItem Style="{StaticResource FlatTabItem}" Header="Improvements" IsEnabled="{Binding AddingOrEditingExpenses, RelativeSource={RelativeSource AncestorType=Page}, Converter={StaticResource BoolInverter}}">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+
+                                <DockPanel Grid.Row="0" Margin="0 0 0 2" Visibility="{Binding AddingOrEditingImprovements, RelativeSource={RelativeSource AncestorType=Page}, Converter={StaticResource VisibleIfFalse}}">
+                                    <local:CircularButton DockPanel.Dock="Right" Style="{StaticResource AddButton}" Height="28" Width="28" Padding="6"
+                                                          HighlightStroke="{StaticResource BtnMouseOverHighlight}" HighlightStrokeThickness="1" Click="AddImprovementButtonClick" ToolTip="Add Improvement"/>
+                                    <local:CircularButton DockPanel.Dock="Right" Style="{StaticResource EditButton}" Height="24" Width="24" Padding="6" Margin="0 0 4 0"
+                                                          HighlightStroke="{StaticResource BtnMouseOverHighlight}" HighlightStrokeThickness="1" Click="EditImprovementsButtonClick" ToolTip="Edit"/>
+                                    <TextBlock FontSize="18" Text="Improvements" VerticalAlignment="Center" Margin="0 0 6 0"/>
+                                </DockPanel>
+
+                                <DockPanel Grid.Row="0" Margin="0 0 0 2" Visibility="{Binding AddingImprovement, RelativeSource={RelativeSource AncestorType=Page}, Converter={StaticResource VisibleIfTrue}}">
+                                    <local:CircularButton DockPanel.Dock="Right" Style="{StaticResource RemoveButton}" Height="20" Width="20" Padding="4"
+                                                          HighlightStroke="{StaticResource BtnMouseOverHighlight}" HighlightStrokeThickness="1" Click="AddImprovementCancelButtonClick"
+                                                          ToolTip="Cancel"/>
+                                    <local:CircularButton DockPanel.Dock="Right" Style="{StaticResource OkButton}" Height="20" Width="20" Padding="4" Margin="0 0 4 0"
+                                                          HighlightStroke="{StaticResource BtnMouseOverHighlight}" HighlightStrokeThickness="1" Click="AddImprovementOkButtonClick"
+                                                          ToolTip="OK"/>
+                                    <TextBlock FontSize="18" Text="Improvements" VerticalAlignment="Center" Margin="0 0 6 0"/>
+                                </DockPanel>
+
+                                <DockPanel Grid.Row="0" Margin="0 0 0 2" Visibility="{Binding EditingImprovements, RelativeSource={RelativeSource AncestorType=Page}, Converter={StaticResource VisibleIfTrue}}">
+                                    <local:CircularButton DockPanel.Dock="Right" Style="{StaticResource RemoveButton}" Height="20" Width="20" Padding="4"
+                                                          HighlightStroke="{StaticResource BtnMouseOverHighlight}" HighlightStrokeThickness="1" Click="EditImprovementsCancelButtonClick" ToolTip="Discard Changes"/>
+                                    <local:CircularButton DockPanel.Dock="Right" Style="{StaticResource OkButton}" Height="20" Width="20" Padding="4" Margin="0 0 4 0"
+                                                          HighlightStroke="{StaticResource BtnMouseOverHighlight}" HighlightStrokeThickness="1" Click="EditImprovementsOkButtonClick" ToolTip="Save Changes"/>
+                                    <TextBlock FontSize="18" Text="Improvements" VerticalAlignment="Center" Margin="0 0 6 0"/>
+                                </DockPanel>
+
+                                <Grid Grid.Row="1" Margin="0 0 0 2" Visibility="{Binding EditingImprovements, RelativeSource={RelativeSource AncestorType=Page}, Converter={StaticResource VisibleIfFalse}}">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="3*"/>
+                                        <ColumnDefinition Width="10*"/>
+                                        <ColumnDefinition Width="3*"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <TextBlock Grid.Column="0" FontWeight="Bold" Text="Date"/>
+                                    <TextBlock Grid.Column="1" FontWeight="Bold" Text="Description"/>
+                                    <TextBlock Grid.Column="2" FontWeight="Bold" Text="Cost"/>
+                                </Grid>
+
+                                <Grid Grid.Row="1" Margin="0 0 0 2" Visibility="{Binding EditingImprovements, RelativeSource={RelativeSource AncestorType=Page}, Converter={StaticResource VisibleIfTrue}}">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="3*"/>
+                                        <ColumnDefinition Width="10*"/>
+                                        <ColumnDefinition Width="3*"/>
+                                        <ColumnDefinition Width="24"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <TextBlock Grid.Column="0" FontWeight="Bold" Text="Date"/>
+                                    <TextBlock Grid.Column="1" FontWeight="Bold" Text="Description"/>
+                                    <TextBlock Grid.Column="2" FontWeight="Bold" Text="Cost"/>
+                                </Grid>
+
+                                <ScrollViewer Grid.Row="2" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                                    <StackPanel>
+                                        <Grid Margin="0 0 0 2" Visibility="{Binding AddingImprovement, RelativeSource={RelativeSource AncestorType=Page}, Converter={StaticResource VisibleIfTrue}}">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="3*"/>
+                                                <ColumnDefinition Width="10*"/>
+                                                <ColumnDefinition Width="3*"/>
+                                            </Grid.ColumnDefinitions>
+
+                                            <DatePicker Grid.Column="0" Margin="0 0 4 0" SelectedDate="{Binding NewImprovement.Date, Mode=TwoWay}"/>
+                                            <TextBox Grid.Column="1" Margin="0 0 4 0" Text="{Binding NewImprovement.Description, Mode=TwoWay}"/>
+                                            <TextBox Grid.Column="2" Text="{Binding NewImprovement.Cost, Mode=TwoWay}"/>
+                                        </Grid>
+
+                                        <ItemsControl ItemsSource="{Binding Improvements}" Visibility="{Binding EditingImprovements, RelativeSource={RelativeSource AncestorType=Page}, Converter={StaticResource VisibleIfFalse}}">
+                                            <ItemsControl.ItemsPanel>
+                                                <ItemsPanelTemplate>
+                                                    <StackPanel/>
+                                                </ItemsPanelTemplate>
+                                            </ItemsControl.ItemsPanel>
+
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <Grid Margin="0 0 0 2">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="3*"/>
+                                                            <ColumnDefinition Width="10*"/>
+                                                            <ColumnDefinition Width="3*"/>
+                                                        </Grid.ColumnDefinitions>
+
+                                                        <TextBlock Grid.Column="0" Text="{Binding Date, StringFormat='dd/MM/yy'}"/>
+                                                        <TextBlock Grid.Column="1" Text="{Binding Description}"/>
+                                                        <TextBlock Grid.Column="2" Text="{Binding Cost, StringFormat='£##,#.00;-£##,#.00;NIL'}"/>
+                                                    </Grid>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+
+                                        <ItemsControl ItemsSource="{Binding ImprovementsForEdit}" Visibility="{Binding EditingImprovements, RelativeSource={RelativeSource AncestorType=Page}, Converter={StaticResource VisibleIfTrue}}">
+                                            <ItemsControl.ItemsPanel>
+                                                <ItemsPanelTemplate>
+                                                    <StackPanel/>
+                                                </ItemsPanelTemplate>
+                                            </ItemsControl.ItemsPanel>
+
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <Grid Margin="0 0 0 4">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="3*"/>
+                                                            <ColumnDefinition Width="10*"/>
+                                                            <ColumnDefinition Width="3*"/>
+                                                            <ColumnDefinition Width="24"/>
+                                                        </Grid.ColumnDefinitions>
+
+                                                        <DatePicker Grid.Column="0" SelectedDate="{Binding Date, Mode=TwoWay}" Tag="{Binding}" Margin="0 0 4 0"
+                                                                    SelectedDateChanged="ImprovementDateChanged"/>
+                                                        <TextBox Grid.Column="1" Text="{Binding Description, Mode=TwoWay}" Tag="{Binding}" Margin="0 0 4 0"
+                                                                 TextChanged="ImprovementDescriptionChanged"/>
+                                                        <TextBox Grid.Column="2" Text="{Binding Cost, Mode=TwoWay}" Tag="{Binding}"
+                                                                 TextChanged="ImprovementCostChanged"/>
+
+                                                        <local:CircularButton Grid.Column="3" Style="{StaticResource RemoveButton}" Width="20" Height="20" Padding="4"
+                                                                              HighlightStroke="{StaticResource BtnMouseOverHighlight}"
+                                                                              HighlightStrokeThickness="1" Margin="4 0 0 0" ToolTip="Delete" Tag="{Binding}"
+                                                                              Click="DeleteImprovementButtonClick"/>
+                                                    </Grid>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </StackPanel>
+                                </ScrollViewer>
+                            </Grid>
+                        </TabItem>
+                    </TabControl>
+                </Border>
+            </Grid>
+        </StackPanel>
+
+    </ScrollViewer>
+</Page>

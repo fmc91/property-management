@@ -1,0 +1,16 @@
+C:\Users\fazal\source\repos\PropertyManagementSystem\PropertyManagementSystem\bin\Debug\netcoreapp3.1\PropertyManagementData.deps.json
+C:\Users\fazal\source\repos\PropertyManagementSystem\PropertyManagementSystem\bin\Debug\netcoreapp3.1\PropertyManagementData.runtimeconfig.json
+C:\Users\fazal\source\repos\PropertyManagementSystem\PropertyManagementSystem\bin\Debug\netcoreapp3.1\PropertyManagementData.runtimeconfig.dev.json
+C:\Users\fazal\source\repos\PropertyManagementSystem\PropertyManagementSystem\bin\Debug\netcoreapp3.1\PropertyManagementData.dll
+C:\Users\fazal\source\repos\PropertyManagementSystem\PropertyManagementSystem\bin\Debug\netcoreapp3.1\PropertyManagementData.pdb
+C:\Users\fazal\source\repos\PropertyManagementSystem\PropertyManagementSystem\bin\Debug\netcoreapp3.1\PropertyManagementCommon.dll
+C:\Users\fazal\source\repos\PropertyManagementSystem\PropertyManagementSystem\bin\Debug\netcoreapp3.1\PropertyManagementCommon.pdb
+C:\Users\fazal\source\repos\PropertyManagementSystem\PropertyManagementSystem\obj\Debug\netcoreapp3.1\PropertyManagementData.csprojAssemblyReference.cache
+C:\Users\fazal\source\repos\PropertyManagementSystem\PropertyManagementSystem\obj\Debug\netcoreapp3.1\PropertyManagementData.AssemblyInfoInputs.cache
+C:\Users\fazal\source\repos\PropertyManagementSystem\PropertyManagementSystem\obj\Debug\netcoreapp3.1\PropertyManagementData.AssemblyInfo.cs
+C:\Users\fazal\source\repos\PropertyManagementSystem\PropertyManagementSystem\obj\Debug\netcoreapp3.1\PropertyManagementData.csproj.CoreCompileInputs.cache
+C:\Users\fazal\source\repos\PropertyManagementSystem\PropertyManagementSystem\obj\Debug\netcoreapp3.1\PropertyManagementData.csproj.CopyComplete
+C:\Users\fazal\source\repos\PropertyManagementSystem\PropertyManagementSystem\obj\Debug\netcoreapp3.1\PropertyManagementData.dll
+C:\Users\fazal\source\repos\PropertyManagementSystem\PropertyManagementSystem\obj\Debug\netcoreapp3.1\PropertyManagementData.pdb
+C:\Users\fazal\source\repos\PropertyManagementSystem\PropertyManagementSystem\obj\Debug\netcoreapp3.1\PropertyManagementData.genruntimeconfig.cache
+C:\Users\fazal\source\repos\PropertyManagementSystem\PropertyManagementSystem\bin\Debug\netcoreapp3.1\PropertyManagement.db
