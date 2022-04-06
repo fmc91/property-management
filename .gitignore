@@ -3,4 +3,6 @@ obj/
 .vs/
 Migrations/
 *.db
+*.db-shm
+*.db-wal
 
