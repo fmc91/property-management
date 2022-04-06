@@ -38,19 +38,19 @@ namespace PropertyManagementUi
 
         private bool _editingImprovements;
 
-        private Dictionary<string, List<string>> _propertyDependencies = new Dictionary<string, List<string>>
-        {
-            { nameof(ShowNoInsuranceText), new List<string> { nameof(ViewModel), nameof(AddingInsurance) } },
-            { nameof(ShowInsuranceDetails), new List<string> { nameof(ViewModel), nameof(AddingInsurance) } },
-            { nameof(ShowNoElectricalCertificateText), new List<string> { nameof(ViewModel), nameof(AddingElectricalCertificate) } },
-            { nameof(ShowElectricalCertificateDetails), new List<string> { nameof(ViewModel), nameof(AddingElectricalCertificate) } },
-            { nameof(ShowNoGasCertificateText), new List<string> { nameof(ViewModel), nameof(AddingGasCertificate) } },
-            { nameof(ShowGasCertificateDetails), new List<string> { nameof(ViewModel), nameof(AddingGasCertificate) } },
-            { nameof(ShowNoEnergyCertificateText), new List<string> { nameof(ViewModel), nameof(AddingEnergyCertificate) } },
-            { nameof(ShowEnergyCertificateDetails), new List<string> { nameof(ViewModel), nameof(AddingEnergyCertificate) } },
-            { nameof(AddingOrEditingExpenses), new List<string> { nameof(AddingExpense), nameof(EditingExpenses) } },
-            { nameof(AddingOrEditingImprovements), new List<string> { nameof(AddingImprovement), nameof(EditingImprovements) } }
-        };
+        //private Dictionary<string, List<string>> _propertyDependencies = new Dictionary<string, List<string>>
+        //{
+        //    { nameof(ShowNoInsuranceText), new List<string> { nameof(ViewModel), nameof(AddingInsurance) } },
+        //    { nameof(ShowInsuranceDetails), new List<string> { nameof(ViewModel), nameof(AddingInsurance) } },
+        //    { nameof(ShowNoElectricalCertificateText), new List<string> { nameof(ViewModel), nameof(AddingElectricalCertificate) } },
+        //    { nameof(ShowElectricalCertificateDetails), new List<string> { nameof(ViewModel), nameof(AddingElectricalCertificate) } },
+        //    { nameof(ShowNoGasCertificateText), new List<string> { nameof(ViewModel), nameof(AddingGasCertificate) } },
+        //    { nameof(ShowGasCertificateDetails), new List<string> { nameof(ViewModel), nameof(AddingGasCertificate) } },
+        //    { nameof(ShowNoEnergyCertificateText), new List<string> { nameof(ViewModel), nameof(AddingEnergyCertificate) } },
+        //    { nameof(ShowEnergyCertificateDetails), new List<string> { nameof(ViewModel), nameof(AddingEnergyCertificate) } },
+        //    { nameof(AddingOrEditingExpenses), new List<string> { nameof(AddingExpense), nameof(EditingExpenses) } },
+        //    { nameof(AddingOrEditingImprovements), new List<string> { nameof(AddingImprovement), nameof(EditingImprovements) } }
+        //};
 
         public PropertyDetailsPage(AppController appController, PropertyDetailsViewModel viewModel)
         {
@@ -213,40 +213,40 @@ namespace PropertyManagementUi
             }
         }
 
-        public bool ShowNoInsuranceText => ViewModel == null ? false : ViewModel.InsurancePolicy == null && !AddingInsurance;
+        //public bool ShowNoInsuranceText => ViewModel == null ? false : ViewModel.InsurancePolicy == null && !AddingInsurance;
 
-        public bool ShowInsuranceDetails => ViewModel == null ? false : ViewModel.InsurancePolicy != null && !AddingInsurance;
+        //public bool ShowInsuranceDetails => ViewModel == null ? false : ViewModel.InsurancePolicy != null && !AddingInsurance;
 
-        public bool ShowNoElectricalCertificateText => ViewModel == null ? false : ViewModel.ElectricalInspectionCertificate == null && !AddingElectricalCertificate;
+        //public bool ShowNoElectricalCertificateText => ViewModel == null ? false : ViewModel.ElectricalInspectionCertificate == null && !AddingElectricalCertificate;
 
-        public bool ShowElectricalCertificateDetails => ViewModel == null ? false : ViewModel.ElectricalInspectionCertificate != null && !AddingElectricalCertificate;
+        //public bool ShowElectricalCertificateDetails => ViewModel == null ? false : ViewModel.ElectricalInspectionCertificate != null && !AddingElectricalCertificate;
 
-        public bool ShowNoGasCertificateText => ViewModel == null ? false : ViewModel.GasSafetyCertificate == null && !AddingGasCertificate;
+        //public bool ShowNoGasCertificateText => ViewModel == null ? false : ViewModel.GasSafetyCertificate == null && !AddingGasCertificate;
 
-        public bool ShowGasCertificateDetails => ViewModel == null ? false : ViewModel.GasSafetyCertificate != null && !AddingGasCertificate;
+        //public bool ShowGasCertificateDetails => ViewModel == null ? false : ViewModel.GasSafetyCertificate != null && !AddingGasCertificate;
 
-        public bool ShowNoEnergyCertificateText => ViewModel == null ? false : ViewModel.EnergyPerformanceCertificate == null && !AddingEnergyCertificate;
+        //public bool ShowNoEnergyCertificateText => ViewModel == null ? false : ViewModel.EnergyPerformanceCertificate == null && !AddingEnergyCertificate;
 
-        public bool ShowEnergyCertificateDetails => ViewModel == null ? false : ViewModel.EnergyPerformanceCertificate != null && !AddingEnergyCertificate;
+        //public bool ShowEnergyCertificateDetails => ViewModel == null ? false : ViewModel.EnergyPerformanceCertificate != null && !AddingEnergyCertificate;
 
-        public bool AddingOrEditingExpenses => AddingExpense || EditingExpenses;
+        //public bool AddingOrEditingExpenses => AddingExpense || EditingExpenses;
 
-        public bool AddingOrEditingImprovements => AddingImprovement || EditingImprovements;
+        //public bool AddingOrEditingImprovements => AddingImprovement || EditingImprovements;
 
         protected void OnPropertyChanged([CallerMemberName] string propertyName = "")
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-            UpdateDependentProperties(propertyName);
+            //UpdateDependentProperties(propertyName);
         }
 
-        private void UpdateDependentProperties(string propertyName)
-        {
-            foreach (var (k, v) in _propertyDependencies)
-            {
-                if (v.Contains(propertyName))
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(k));
-            }
-        }
+        //private void UpdateDependentProperties(string propertyName)
+        //{
+        //    foreach (var (k, v) in _propertyDependencies)
+        //    {
+        //        if (v.Contains(propertyName))
+        //            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(k));
+        //    }
+        //}
 
         private void EditButtonClick(object sender, RoutedEventArgs e)
         {

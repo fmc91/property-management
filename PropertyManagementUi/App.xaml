@@ -35,11 +35,16 @@
         <local:BooleanInverter x:Key="BoolInverter"/>
         <local:BoolVisibilityConverter x:Key="VisibleIfTrue"/>
         <local:BoolVisibilityConverter x:Key="VisibleIfFalse" InvertLogic="True"/>
+        <local:NullBoolConverter x:Key="TrueIfNotNull"/>
+        <local:NullBoolConverter x:Key="TrueIfNull" InvertLogic="True"/>
         <local:NullVisibilityConverter x:Key="VisibleIfNotNull"/>
         <local:NullVisibilityConverter x:Key="VisibleIfNull" InvertLogic="True"/>
         <local:NonEmptyVisibilityConverter x:Key="VisibleIfNonEmpty"/>
         <local:NonEmptyVisibilityConverter x:Key="VisibleIfEmpty" InvertLogic="True"/>
         <local:NullOrEmptyVisibilityConverter x:Key="VisibleIfNotNullOrEmpty"/>
+        <local:AndVisibilityConverter x:Key="AndVisibilityConverter"/>
+        <local:OrVisibilityConverter x:Key="NorVisibilityConverter" InvertOutput="True"/>
+        <local:OrConverter x:Key="NorConverter" InvertOutput="True"/>
         <local:DateBrushConverter x:Key="DateBrush" AmberThreshold="3" RedThreshold="1"/>
         <local:DateBoolConverter x:Key="TrueIfDateGreater" Inclusive="False" InvertLogic="False"/>
         <local:TemplateImageConverter x:Key="TemplateImageConverter"/>

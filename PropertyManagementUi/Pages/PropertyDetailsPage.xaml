@@ -304,11 +304,24 @@
                             <TextBlock VerticalAlignment="Center" FontSize="18" Text="Insurance"/>
                         </DockPanel>
 
-                        <TextBlock Margin="0 4 0 0" FontSize="18" FontWeight="Bold" Foreground="Red" Text="NO INSURANCE" HorizontalAlignment="Center"
-                                    Visibility="{Binding ShowNoInsuranceText, RelativeSource={RelativeSource AncestorType=Page}, Converter={StaticResource VisibleIfTrue}}"/>
+                        <TextBlock Margin="0 4 0 0" FontSize="18" FontWeight="Bold" Foreground="Red" Text="NO INSURANCE" HorizontalAlignment="Center">
+                            <TextBlock.Visibility>
+                                <MultiBinding Converter="{StaticResource AndVisibilityConverter}">
+                                    <Binding Path="InsurancePolicy" Converter="{StaticResource TrueIfNull}"/>
+                                    <Binding Path="AddingInsurance" RelativeSource="{RelativeSource  AncestorType=Page}" Converter="{StaticResource BoolInverter}"/>
+                                </MultiBinding>
+                            </TextBlock.Visibility>
+                        </TextBlock>
 
-                        <StackPanel DataContext="{Binding InsurancePolicy}"
-                                    Visibility="{Binding ShowInsuranceDetails, RelativeSource={RelativeSource AncestorType=Page}, Converter={StaticResource VisibleIfTrue}}">
+                        <StackPanel DataContext="{Binding InsurancePolicy}">
+
+                            <StackPanel.Visibility>
+                                <MultiBinding Converter="{StaticResource AndVisibilityConverter}">
+                                    <Binding Path="." Converter="{StaticResource TrueIfNotNull}"/>
+                                    <Binding Path="AddingInsurance" RelativeSource="{RelativeSource  AncestorType=Page}" Converter="{StaticResource BoolInverter}"/>
+                                </MultiBinding>
+                            </StackPanel.Visibility>
+                            
                             <DockPanel Margin="0 0 0 4">
                                 <TextBlock DockPanel.Dock="Right" FontSize="16" Text="{Binding StartDate, StringFormat='dd MMMM yyyy'}"/>
                                 <TextBlock VerticalAlignment="Center" FontWeight="Bold" Text="Start Date"/>
@@ -451,11 +464,24 @@
                                 <TextBlock VerticalAlignment="Center" FontSize="18" Text="Electrical Inspection Certificate"/>
                             </DockPanel>
 
-                            <TextBlock FontSize="18" FontWeight="Bold" Foreground="Red" Text="NO CERTIFICATE" HorizontalAlignment="Center"
-                                    Visibility="{Binding ShowNoElectricalCertificateText, RelativeSource={RelativeSource AncestorType=Page}, Converter={StaticResource VisibleIfTrue}}"/>
+                            <TextBlock FontSize="18" FontWeight="Bold" Foreground="Red" Text="NO CERTIFICATE" HorizontalAlignment="Center">
+                                <TextBlock.Visibility>
+                                    <MultiBinding Converter="{StaticResource AndVisibilityConverter}">
+                                        <Binding Path="ElectricalInspectionCertificate" Converter="{StaticResource TrueIfNull}"/>
+                                        <Binding Path="AddingElectricalCertificate" RelativeSource="{RelativeSource AncestorType=Page}" Converter="{StaticResource BoolInverter}"/>
+                                    </MultiBinding>
+                                </TextBlock.Visibility>
+                            </TextBlock>
 
-                            <StackPanel Visibility="{Binding ShowElectricalCertificateDetails, RelativeSource={RelativeSource AncestorType=Page}, Converter={StaticResource VisibleIfTrue}}"
-                                        DataContext="{Binding ElectricalInspectionCertificate}">
+                            <StackPanel DataContext="{Binding ElectricalInspectionCertificate}">
+                                
+                                <StackPanel.Visibility>
+                                    <MultiBinding Converter="{StaticResource AndVisibilityConverter}">
+                                        <Binding Path="." Converter="{StaticResource TrueIfNotNull}"/>
+                                        <Binding Path="AddingElectricalCertificate" RelativeSource="{RelativeSource AncestorType=Page}" Converter="{StaticResource BoolInverter}"/>
+                                    </MultiBinding>
+                                </StackPanel.Visibility>
+                                
                                 <DockPanel Margin="0 0 0 4">
                                     <TextBlock DockPanel.Dock="Right" FontSize="16" Text="{Binding IssueDate, StringFormat='dd MMMM yyyy'}"/>
                                     <TextBlock VerticalAlignment="Center" FontWeight="Bold" Text="Issue Date"/>
@@ -498,11 +524,23 @@
                                 <TextBlock VerticalAlignment="Center" FontSize="18" Text="Gas Safety Certificate"/>
                             </DockPanel>
 
-                            <TextBlock FontSize="18" FontWeight="Bold" Foreground="Red" Text="NO CERTIFICATE" HorizontalAlignment="Center"
-                                    Visibility="{Binding ShowNoGasCertificateText, RelativeSource={RelativeSource AncestorType=Page}, Converter={StaticResource VisibleIfTrue}}"/>
+                            <TextBlock FontSize="18" FontWeight="Bold" Foreground="Red" Text="NO CERTIFICATE" HorizontalAlignment="Center">
+                                <TextBlock.Visibility>
+                                    <MultiBinding Converter="{StaticResource AndVisibilityConverter}">
+                                        <Binding Path="GasSafetyCertificate" Converter="{StaticResource TrueIfNull}"/>
+                                        <Binding Path="AddingGasCertificate" RelativeSource="{RelativeSource AncestorType=Page}" Converter="{StaticResource BoolInverter}"/>
+                                    </MultiBinding>
+                                </TextBlock.Visibility>
+                            </TextBlock>
 
-                            <StackPanel Visibility="{Binding ShowGasCertificateDetails, RelativeSource={RelativeSource AncestorType=Page}, Converter={StaticResource VisibleIfTrue}}"
-                                        DataContext="{Binding GasSafetyCertificate}">
+                            <StackPanel DataContext="{Binding GasSafetyCertificate}">
+
+                                <StackPanel.Visibility>
+                                    <MultiBinding Converter="{StaticResource AndVisibilityConverter}">
+                                        <Binding Path="." Converter="{StaticResource TrueIfNotNull}"/>
+                                        <Binding Path="AddingGasCertificate" RelativeSource="{RelativeSource AncestorType=Page}" Converter="{StaticResource BoolInverter}"/>
+                                    </MultiBinding>
+                                </StackPanel.Visibility>
 
                                 <DockPanel Margin="0 0 0 4">
                                     <TextBlock DockPanel.Dock="Right" FontSize="16" Text="{Binding IssueDate, StringFormat='dd MMMM yyyy'}"/>
@@ -546,11 +584,22 @@
                                 <TextBlock VerticalAlignment="Center" FontSize="18" Text="Energy Performance Certificate"/>
                             </DockPanel>
 
-                            <TextBlock FontSize="18" FontWeight="Bold" Foreground="Red" Text="NO CERTIFICATE" HorizontalAlignment="Center"
-                                    Visibility="{Binding ShowNoEnergyCertificateText, RelativeSource={RelativeSource AncestorType=Page}, Converter={StaticResource VisibleIfTrue}}"/>
+                            <TextBlock FontSize="18" FontWeight="Bold" Foreground="Red" Text="NO CERTIFICATE" HorizontalAlignment="Center">
+                                <TextBlock.Visibility>
+                                    <MultiBinding Converter="{StaticResource AndVisibilityConverter}">
+                                        <Binding Path="EnergyPerformanceCertificate" Converter="{StaticResource TrueIfNull}"/>
+                                        <Binding Path="AddingEnergyCertificate" RelativeSource="{RelativeSource AncestorType=Page}" Converter="{StaticResource BoolInverter}"/>
+                                    </MultiBinding>
+                                </TextBlock.Visibility>
+                            </TextBlock>
 
-                            <StackPanel Visibility="{Binding ShowEnergyCertificateDetails, RelativeSource={RelativeSource AncestorType=Page}, Converter={StaticResource VisibleIfTrue}}"
-                                        DataContext="{Binding EnergyPerformanceCertificate}">
+                            <StackPanel DataContext="{Binding EnergyPerformanceCertificate}">
+                                <StackPanel.Visibility>
+                                    <MultiBinding Converter="{StaticResource AndVisibilityConverter}">
+                                        <Binding Path="." Converter="{StaticResource TrueIfNotNull}"/>
+                                        <Binding Path="AddingEnergyCertificate" RelativeSource="{RelativeSource AncestorType=Page}" Converter="{StaticResource BoolInverter}"/>
+                                    </MultiBinding>
+                                </StackPanel.Visibility>
                                 <DockPanel Margin="0 0 0 4">
                                     <TextBlock DockPanel.Dock="Right" FontSize="16" Text="{Binding IssueDate, StringFormat='dd MMMM yyyy'}"/>
                                     <TextBlock VerticalAlignment="Center" FontWeight="Bold" Text="Issue Date"/>
@@ -586,7 +635,13 @@
 
                 <Border Grid.Column="2" Style="{StaticResource InfoPanel}" Margin="4 4 0 0">
                     <TabControl Style="{StaticResource FlatTabControl}">
-                        <TabItem Style="{StaticResource FlatTabItem}" Header="Expenses" IsEnabled="{Binding AddingOrEditingImprovements, RelativeSource={RelativeSource AncestorType=Page}, Converter={StaticResource BoolInverter}}">
+                        <TabItem Style="{StaticResource FlatTabItem}" Header="Expenses">
+                            <TabItem.IsEnabled>
+                                <MultiBinding Converter="{StaticResource NorConverter}">
+                                    <Binding Path="AddingImprovement" RelativeSource="{RelativeSource AncestorType=Page}"/>
+                                    <Binding Path="EditingImprovements" RelativeSource="{RelativeSource AncestorType=Page}"/>
+                                </MultiBinding>
+                            </TabItem.IsEnabled>
                             <Grid>
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto"/>
@@ -594,7 +649,13 @@
                                     <RowDefinition Height="*"/>
                                 </Grid.RowDefinitions>
 
-                                <DockPanel Grid.Row="0" Margin="0 0 0 2" Visibility="{Binding AddingOrEditingExpenses, RelativeSource={RelativeSource AncestorType=Page}, Converter={StaticResource VisibleIfFalse}}">
+                                <DockPanel Grid.Row="0" Margin="0 0 0 2">
+                                    <DockPanel.Visibility>
+                                        <MultiBinding Converter="{StaticResource NorVisibilityConverter}">
+                                            <Binding Path="AddingExpense" RelativeSource="{RelativeSource AncestorType=Page}"/>
+                                            <Binding Path="EditingExpenses" RelativeSource="{RelativeSource AncestorType=Page}"/>
+                                        </MultiBinding>
+                                    </DockPanel.Visibility>
                                     <local:CircularButton DockPanel.Dock="Right" Style="{StaticResource AddButton}" Height="28" Width="28" Padding="6"
                                                           HighlightStroke="{StaticResource BtnMouseOverHighlight}" HighlightStrokeThickness="1" Click="AddExpenseButtonClick" ToolTip="Add Expense"/>
                                     <local:CircularButton DockPanel.Dock="Right" Style="{StaticResource EditButton}" Height="24" Width="24" Padding="6" Margin="0 0 4 0"
@@ -719,7 +780,14 @@
                             </Grid>
                         </TabItem>
 
-                        <TabItem Style="{StaticResource FlatTabItem}" Header="Improvements" IsEnabled="{Binding AddingOrEditingExpenses, RelativeSource={RelativeSource AncestorType=Page}, Converter={StaticResource BoolInverter}}">
+                        <TabItem Style="{StaticResource FlatTabItem}" Header="Improvements">
+                            <TabItem.IsEnabled>
+                                <MultiBinding Converter="{StaticResource NorConverter}">
+                                    <Binding Path="AddingExpense" RelativeSource="{RelativeSource AncestorType=Page}"/>
+                                    <Binding Path="EditingExpenses" RelativeSource="{RelativeSource AncestorType=Page}"/>
+                                </MultiBinding>
+                            </TabItem.IsEnabled>
+                            
                             <Grid>
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto"/>
@@ -727,7 +795,14 @@
                                     <RowDefinition Height="*"/>
                                 </Grid.RowDefinitions>
 
-                                <DockPanel Grid.Row="0" Margin="0 0 0 2" Visibility="{Binding AddingOrEditingImprovements, RelativeSource={RelativeSource AncestorType=Page}, Converter={StaticResource VisibleIfFalse}}">
+                                <DockPanel Grid.Row="0" Margin="0 0 0 2">
+                                    <DockPanel.Visibility>
+                                        <MultiBinding Converter="{StaticResource NorVisibilityConverter}">
+                                            <Binding Path="AddingImprovement" RelativeSource="{RelativeSource AncestorType=Page}"/>
+                                            <Binding Path="EditingImprovements" RelativeSource="{RelativeSource AncestorType=Page}"/>
+                                        </MultiBinding>
+                                    </DockPanel.Visibility>
+
                                     <local:CircularButton DockPanel.Dock="Right" Style="{StaticResource AddButton}" Height="28" Width="28" Padding="6"
                                                           HighlightStroke="{StaticResource BtnMouseOverHighlight}" HighlightStrokeThickness="1" Click="AddImprovementButtonClick" ToolTip="Add Improvement"/>
                                     <local:CircularButton DockPanel.Dock="Right" Style="{StaticResource EditButton}" Height="24" Width="24" Padding="6" Margin="0 0 4 0"
