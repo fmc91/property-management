@@ -1,2 +1,5 @@
 *.db
 Migrations/
+.vs/
+bin/
+obj/
