@@ -1,15 +1,32 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using PropertyManagementCommon;
-using PropertyManagementCommon.Model;
-using PropertyManagementService;
+using PropertyManagementService.Model;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 
-namespace PropertyManagementUi
+namespace PropertyManagementUi.ViewModels
 {
-    public class TenancyDetailsViewModel
+    public class TenancyDetailsViewModel : INotifyPropertyChanged
     {
+        private AccountEntry _newPayment;
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public TenancyDetailsViewModel()
+        {
+            AccountEntries = new ObservableCollection<AccountEntry>();
+
+            AccountEntries.CollectionChanged += (s, e) =>
+            {
+                OnPropertyChanged(nameof(AccountBalance));
+                OnPropertyChanged(nameof(OutstandingBalance));
+            };
+        }
+
         public int TenancyId { get; set; }
 
         public int PropertyId { get; set; }
@@ -28,7 +45,7 @@ namespace PropertyManagementUi
 
         public string Postcode { get; set; }
 
-        public List<Tenant> CurrentTenants { get; set; }
+        public List<Tenant> Tenants { get; set; }
 
         public DateTime StartDate { get; set; }
 
@@ -38,14 +55,37 @@ namespace PropertyManagementUi
 
         public DateTime FirstPayment { get; set; }
 
-        public double OutstandingBalance { get; set; }
+        public DateTime? NextPaymentDate { get; set; }
 
-        public DateTime? NextPaymentDue { get; set; }
+        public Agent Agent { get; set; }
 
         public List<Rate> Rates { get; set; }
 
-        public List<TenancyAccountEntry> AccountEntries { get; set; }
+        public ObservableCollection<AccountEntry> AccountEntries { get; }
 
-        public double AccountBalance => AccountEntries == null ? 0d : AccountEntries.Sum(e => e.Amount);
+        public double Deposit { get; set; }
+
+        public double AccountBalance => AccountEntries.Sum(e => e.Amount);
+
+        public double OutstandingBalance => AccountBalance > 0 ? 0 : AccountBalance * -1;
+
+        public AccountEntry NewPayment
+        {
+            get { return _newPayment; }
+
+            set
+            {
+                if (_newPayment != value)
+                {
+                    _newPayment = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        protected void OnPropertyChanged([CallerMemberName] string propertyName = "")
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
     }
 }

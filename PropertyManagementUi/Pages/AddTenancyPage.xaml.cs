@@ -1,7 +1,7 @@
-﻿using PropertyManagementCommon.Model;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Windows;
@@ -13,6 +13,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using PropertyManagementService.Model;
+using PropertyManagementUi.ViewModels;
 
 namespace PropertyManagementUi
 {
@@ -22,6 +24,7 @@ namespace PropertyManagementUi
     public partial class AddTenancyPage : Page, INotifyPropertyChanged
     {
         private AppController _appController;
+
         private bool _addingAgent;
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -56,6 +59,9 @@ namespace PropertyManagementUi
 
         private void SaveButtonClick(object sender, RoutedEventArgs e)
         {
+            if (ViewModel.Agent == null || ViewModel.Tenants.Any(t => String.IsNullOrWhiteSpace(t.Name) || String.IsNullOrWhiteSpace(t.Telephone)))
+                return;
+
             _appController.AddTenancy(ViewModel);
         }
 
@@ -111,7 +117,6 @@ namespace PropertyManagementUi
                 String.IsNullOrWhiteSpace(ViewModel.NewAgent.Telephone))
                 return;
 
-            _appController.AddAgent(ViewModel.NewAgent);
             ViewModel.Agents.Add(ViewModel.NewAgent);
 
             ViewModel.Agent = ViewModel.NewAgent;

@@ -1,20 +1,25 @@
-﻿using PropertyManagementCommon;
-using PropertyManagementCommon.Model;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Text;
+using PropertyManagementCommon;
+using PropertyManagementService.Model;
 
-namespace PropertyManagementUi
+namespace PropertyManagementUi.ViewModels
 {
     public class AddPropertyViewModel : INotifyPropertyChanged
     {
-        private ObservableCollection<Owner> _owners;
+        private string _imagePath;
 
         private Owner _owner;
-        private string _newOwnerName;
+
+        private Owner _newOwner;
+
+        private ObservableCollection<Owner> _owners;
+
+        public event PropertyChangedEventHandler PropertyChanged;
 
         public AddPropertyViewModel()
         {
@@ -24,7 +29,7 @@ namespace PropertyManagementUi
             PurchaseDate = DateTime.Today;
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public int? ImageId { get; set; }
 
         public string StreetAddress1 { get; set; }
 
@@ -40,15 +45,23 @@ namespace PropertyManagementUi
 
         public string Postcode { get; set; }
 
-        public ObservableCollection<Owner> Owners
+        public DateTime PurchaseDate { get; set; }
+
+        public double PurchasePrice { get; set; }
+
+        public PropertyKind PropertyKind { get; set; }
+
+        public ObservableCollection<PurchaseCost> PurchaseCosts { get; }
+
+        public string ImagePath
         {
-            get { return _owners; }
+            get { return _imagePath; }
 
             set
             {
-                if (_owners != value)
+                if (_imagePath != value)
                 {
-                    _owners = value;
+                    _imagePath = value;
                     OnPropertyChanged();
                 }
             }
@@ -68,29 +81,35 @@ namespace PropertyManagementUi
             }
         }
 
-        public string NewOwnerName
+        public Owner NewOwner
         {
-            get { return _newOwnerName; }
+            get { return _newOwner; }
 
             set
             {
-                if (_newOwnerName != value)
+                if (_newOwner != value)
                 {
-                    _newOwnerName = value;
+                    _newOwner = value;
                     OnPropertyChanged();
                 }
             }
         }
 
-        public DateTime PurchaseDate { get; set; }
+        public ObservableCollection<Owner> Owners
+        {
+            get { return _owners; }
 
-        public double PurchasePrice { get; set; }
+            set
+            {
+                if (_owners != value)
+                {
+                    _owners = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
 
-        public PropertyType PropertyType { get; set; }
-
-        public ObservableCollection<PurchaseCost> PurchaseCosts { get; }
-
-        private void OnPropertyChanged([CallerMemberName] string propertyName = "")
+        protected void OnPropertyChanged([CallerMemberName] string propertyName = "")
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }

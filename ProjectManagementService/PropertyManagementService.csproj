@@ -1,12 +1,17 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
+    <Nullable>disable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="11.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\PropertyManagementCommon\PropertyManagementCommon.csproj" />
-    <ProjectReference Include="..\PropertyManagementSystem\PropertyManagementData.csproj" />
+    <ProjectReference Include="..\PropertyManagementData\PropertyManagementData.csproj" />
   </ItemGroup>
 
 </Project>

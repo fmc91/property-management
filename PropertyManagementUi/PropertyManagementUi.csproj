@@ -2,8 +2,9 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net6.0-windows</TargetFramework>
     <UseWPF>true</UseWPF>
+    <Nullable>disable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
@@ -23,6 +24,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ProjectManagementService\PropertyManagementService.csproj" />
+    <ProjectReference Include="..\PropertyManagementBootstrap\PropertyManagementBootstrap.csproj" />
     <ProjectReference Include="..\PropertyManagementCommon\PropertyManagementCommon.csproj" />
   </ItemGroup>
 
@@ -42,6 +44,13 @@
     <Resource Include="Icons\tick.png" />
     <Resource Include="Icons\view_detail.png" />
     <Resource Include="Images\house.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="App.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+      <SubType>Designer</SubType>
+    </Page>
   </ItemGroup>
 
 </Project>

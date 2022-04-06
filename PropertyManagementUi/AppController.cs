@@ -1,11 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Collections.ObjectModel;
+using System.IO;
 using System.Text;
 using System.Windows.Navigation;
-using System.Collections.ObjectModel;
-using PropertyManagementCommon.Model;
+using AutoMapper;
+using PropertyManagementBootstrap;
+using PropertyManagementCommon;
 using PropertyManagementService;
+using PropertyManagementService.Model;
+using PropertyManagementUi.ViewModels;
 
 namespace PropertyManagementUi
 {
@@ -13,458 +17,376 @@ namespace PropertyManagementUi
     {
         private NavigationWindow _mainWindow;
 
-        private PropertyService _propertyService;
-
-        private RentAssistant _rentAssistant;
+        private ServiceProvider _serviceProvider;
 
         private RateAssistant _rateAssistant;
 
-        public AppController(NavigationWindow mainWindow, PropertyService propertyService)
+        private IMapper _mapper;
+
+        public AppController(NavigationWindow mainWindow, ServiceProvider serviceProvider, RateAssistant rateAssistant, IMapper mapper)
         {
             _mainWindow = mainWindow;
-            _propertyService = propertyService;
+            _serviceProvider = serviceProvider;
 
-            _rentAssistant = new RentAssistant(propertyService);
-            _rateAssistant = new RateAssistant();
+            _rateAssistant = rateAssistant;
+            _mapper = mapper;
         }
 
         public void IndexPage()
         {
-            var propertySummaries = _propertyService.GetAllProperties()
-                .Select(p => CreatePropertySummaryViewModel(p));
+            using var propertyService = _serviceProvider.GetPropertyService();
 
-            var viewModel = new IndexViewModel { Properties = new ObservableCollection<PropertySummaryViewModel>(propertySummaries) };
+            var viewModel = new IndexViewModel
+            {
+                Properties = _mapper.Map<ObservableCollection<PropertySummaryViewModel>>(propertyService.GetAllProperties())
+            };
 
             _mainWindow.Navigate(new IndexPage(this, viewModel));
         }
 
         public void AddPropertyPage()
         {
-            var viewModel = CreateAddPropertyViewModel();
+            using var propertyService = _serviceProvider.GetPropertyService();
+
+            var viewModel = new AddPropertyViewModel
+            {
+                Owners = new ObservableCollection<Owner>(propertyService.GetAllOwners())
+            };
+
             _mainWindow.Navigate(new AddPropertyPage(this, viewModel));
         }
 
         public void PropertyDetailsPage(int propertyId)
         {
-            var viewModel = CreatePropertyDetailsViewModel(propertyId);
+            using var propertyService = _serviceProvider.GetPropertyService();
+
+            using var imageService = _serviceProvider.GetImageService();
+
+            var viewModel = _mapper.Map<PropertyDetailsViewModel>(propertyService.GetProperty(propertyId));
+
+            if (viewModel.ImageId is int imageId)
+                viewModel.ImagePath = imageService.GetImagePath(imageId);
+
             _mainWindow.Navigate(new PropertyDetailsPage(this, viewModel));
         }
 
         public void AddTenancyPage(int propertyId)
         {
-            var viewModel = CreateAddTenancyViewModel(propertyId);
+            using var propertyService = _serviceProvider.GetPropertyService();
+
+            var viewModel = new AddTenancyViewModel
+            {
+                PropertyId = propertyId,
+                Agents = new ObservableCollection<Agent>(propertyService.GetAllAgents())
+            };
+
             _mainWindow.Navigate(new AddTenancyPage(this, viewModel));
         }
 
-        public void EditTenancy(EditTenancyViewModel editTenancyViewModel)
+        public void EditProperty(EditPropertyViewModel viewModel)
         {
-            var tenancy = _propertyService.GetTenancy(editTenancyViewModel.TenancyId);
+            using var propertyService = _serviceProvider.GetPropertyService();
 
-            var prevDepositAmount = tenancy.Deposit;
-            var prevFirstPayment = tenancy.FirstPayment;
-            var prevPaymentFrequency = tenancy.PaymentFrequency;
+            propertyService.UpdateProperty(_mapper.Map<Property>(viewModel));
 
-            tenancy.AgentId = editTenancyViewModel.AgentId;
-            tenancy.StartDate = editTenancyViewModel.StartDate;
-            tenancy.EndDate = editTenancyViewModel.EndDate;
-            tenancy.PaymentFrequency = editTenancyViewModel.PaymentFrequency;
-            tenancy.FirstPayment = editTenancyViewModel.FirstPayment;
-            tenancy.Deposit = editTenancyViewModel.DepositAmount;
-
-            _propertyService.EditTenancy(tenancy);
-
-            _propertyService.AddTenants(editTenancyViewModel.AddedTenants);
-            _propertyService.DeleteTenants(editTenancyViewModel.DeletedTenants);
-            _propertyService.EditTenants(editTenancyViewModel.ModifiedTenants);
-
-            bool ratesModified = editTenancyViewModel.AddedRates.Count != 0 || editTenancyViewModel.DeletedRates.Count != 0 || editTenancyViewModel.ModifiedRates.Count != 0;
-            bool paymentSchedulingModified = tenancy.PaymentFrequency != prevPaymentFrequency || tenancy.FirstPayment != prevFirstPayment;
-
-            if (ratesModified)
-            {
-                _propertyService.AddRates(editTenancyViewModel.AddedRates);
-                _propertyService.DeleteRates(editTenancyViewModel.DeletedRates);
-                _propertyService.EditRates(editTenancyViewModel.ModifiedRates);
-            }
-
-            if (ratesModified || paymentSchedulingModified)
-            {
-                _propertyService.DeleteAllScheduledPayments(tenancy.TenancyId);
-
-                var rates = _propertyService.GetRates(tenancy.TenancyId);
-
-                var scheduledPayments = _rateAssistant.CreateScheduledPayments(tenancy.TenancyId, rates, tenancy.FirstPayment, tenancy.PaymentFrequency);
-
-                _propertyService.AddScheduledPayments(scheduledPayments);
-                _propertyService.AddScheduledPayment(new ScheduledPayment
-                {
-                    TenancyId = tenancy.TenancyId,
-                    Date = tenancy.StartDate,
-                    Amount = tenancy.Deposit
-                });
-            }
-            else if (tenancy.Deposit != prevDepositAmount)
-            {
-                //THIS NEEDS TO CHANGE!!!
-                _propertyService.AddScheduledPayment(new ScheduledPayment
-                {
-                    TenancyId = tenancy.TenancyId,
-                    Date = tenancy.StartDate,
-                    Amount = tenancy.Deposit - prevDepositAmount
-                });
-            }
-
-            TenancyDetailsPage(tenancy.TenancyId);
+            PropertyDetailsPage(viewModel.PropertyId);
         }
 
-        public void EditTenancyPage(int tenancyId)
+        public void AddPayment(int tenancyId, AccountEntry newPayment)
         {
-            var viewModel = CreateEditTenancyViewModel(tenancyId);
+            using var propertyService = _serviceProvider.GetPropertyService();
+
+            propertyService.AddAccountEntry(tenancyId, newPayment);
+        }
+
+        public void EditTenancyPage(int propertyId)
+        {
+            using var propertyService = _serviceProvider.GetPropertyService();
+
+            var viewModel = _mapper.Map<EditTenancyViewModel>(propertyService.GetTenancy(propertyId));
+            viewModel.Agents = new ObservableCollection<Agent>(propertyService.GetAllAgents());
+
             _mainWindow.Navigate(new EditTenancyPage(this, viewModel));
         }
 
         public void TenancyDetailsPage(int tenancyId)
         {
-            var viewModel = CreateTenancyDetailsViewModel(tenancyId);
+            using var propertyService = _serviceProvider.GetPropertyService();
+
+            var viewModel = _mapper.Map<TenancyDetailsViewModel>(propertyService.GetTenancy(tenancyId));
+
             _mainWindow.Navigate(new TenancyDetailsPage(this, viewModel));
-        }
-
-        public void AddTenancy(AddTenancyViewModel viewModel)
-        {
-            var newTenancy = new Tenancy
-            {
-                PropertyId = viewModel.PropertyId,
-                StartDate = viewModel.StartDate,
-                EndDate = viewModel.EndDate,
-                FirstPayment = viewModel.FirstPayment,
-                PaymentFrequency = viewModel.PaymentFrequency,
-                Deposit = viewModel.DepositAmount,
-                AgentId = viewModel.Agent.AgentId
-            };
-
-            _propertyService.AddTenancy(newTenancy);
-
-            foreach (var tenant in viewModel.Tenants)
-                tenant.TenancyId = newTenancy.TenancyId;
-
-            _propertyService.AddTenants(viewModel.Tenants);
-
-            foreach (var rate in viewModel.Rates)
-                rate.TenancyId = newTenancy.TenancyId;
-
-            _propertyService.AddRates(viewModel.Rates);
-
-            var scheduledPayments = _rateAssistant.CreateScheduledPayments(newTenancy.TenancyId, viewModel.Rates, viewModel.FirstPayment, viewModel.PaymentFrequency);
-
-            _propertyService.AddScheduledPayments(scheduledPayments);
-            _propertyService.AddScheduledPayment(new ScheduledPayment
-            {
-                TenancyId = newTenancy.TenancyId,
-                Date = newTenancy.StartDate,
-                Amount = newTenancy.Deposit
-            });
-
-            PropertyDetailsPage(viewModel.PropertyId);
         }
 
         public void AddProperty(AddPropertyViewModel viewModel)
         {
-            var newProperty = new Property
-            {
-                PropertyType = viewModel.PropertyType,
-                OwnerId = viewModel.Owner.OwnerId,
-                StreetAddress1 = viewModel.StreetAddress1,
-                StreetAddress2 = viewModel.StreetAddress2,
-                Locality = viewModel.Locality,
-                City = viewModel.City,
-                County = viewModel.County,
-                Country = viewModel.Country,
-                Postcode = viewModel.Postcode,
-                PurchaseDate = viewModel.PurchaseDate,
-                PurchasePrice = viewModel.PurchasePrice
-            };
+            using var propertyService = _serviceProvider.GetPropertyService();
 
-            _propertyService.AddProperty(newProperty);
-
-            foreach (var pc in viewModel.PurchaseCosts)
-                pc.PropertyId = newProperty.PropertyId;
-            
-            _propertyService.AddPurchaseCosts(viewModel.PurchaseCosts);
+            propertyService.AddProperty(_mapper.Map<Property>(viewModel));
 
             IndexPage();
         }
 
+        public void AddImage(string sourcePath, AddPropertyViewModel viewModel)
+        {
+            using var imageService = _serviceProvider.GetImageService();
+
+            if (viewModel.ImageId is int oldImageId)
+            {
+                viewModel.ImagePath = null;
+                imageService.DeleteImage(oldImageId);
+            }
+
+            int imageId = imageService.SaveImage(sourcePath);
+
+            viewModel.ImageId = imageId;
+            viewModel.ImagePath = imageService.GetImagePath(imageId);
+        }
+
+        public void ClearImage(AddPropertyViewModel viewModel)
+        {
+            if (viewModel.ImageId is not int imageId) return;
+
+            using var imageService = _serviceProvider.GetImageService();
+            
+            viewModel.ImagePath = null;
+            viewModel.ImageId = null;
+            imageService.DeleteImage(imageId);
+        }
+
+        public void AddImage(string sourcePath, EditPropertyViewModel viewModel)
+        {
+            using var imageService = _serviceProvider.GetImageService();
+
+            if (viewModel.ImageId is int oldImageId)
+            {
+                viewModel.ImagePath = null;
+                imageService.DeleteImage(oldImageId);
+            }
+
+            int imageId = imageService.SaveImage(sourcePath);
+
+            viewModel.ImageId = imageId;
+            viewModel.ImagePath = imageService.GetImagePath(imageId);
+        }
+
+        public void ClearImage(EditPropertyViewModel viewModel)
+        {
+            if (viewModel.ImageId is not int imageId) return;
+
+            using var imageService = _serviceProvider.GetImageService();
+
+            viewModel.ImagePath = null;
+            viewModel.ImageId = null;
+            imageService.DeleteImage(imageId);
+        }
+
+        public void UpdateTenancy(EditTenancyViewModel editTenancyViewModel)
+        {
+            using var propertyService = _serviceProvider.GetPropertyService();
+
+            var tenancy = propertyService.GetTenancy(editTenancyViewModel.TenancyId);
+
+            var oldRates = tenancy.Rates;
+            var newRates = editTenancyViewModel.Rates;
+
+            bool haveRatesChanged = _rateAssistant.HaveRatesChanged(oldRates, newRates);
+
+            _mapper.Map(editTenancyViewModel, tenancy);
+
+            if (haveRatesChanged)
+            {
+                tenancy.ScheduledPayments.RemoveAll(p => p.Date >= DateTime.Today);
+                tenancy.ScheduledPayments.AddRange(
+                    _rateAssistant.CreateScheduledPaymentsAfterDate(tenancy, DateTime.Today));
+            }
+
+            propertyService.UpdateTenancy(tenancy);
+
+            TenancyDetailsPage(editTenancyViewModel.TenancyId);
+        }
+
+        public void AddTenancy(AddTenancyViewModel viewModel)
+        {
+            using var propertyService = _serviceProvider.GetPropertyService();
+
+            var tenancy = _mapper.Map<Tenancy>(viewModel);
+
+            tenancy.AccountEntries.Add(new AccountEntry
+            {
+                Amount = tenancy.Deposit * -1,
+                Date = tenancy.StartDate,
+                Description = "Deposit due",
+                Kind = AccountEntryKind.AmountOwed
+            });
+
+            tenancy.ScheduledPayments.AddRange(
+                _rateAssistant.CreateScheduledPayments(tenancy));
+
+            propertyService.AddTenancy(tenancy);
+
+            PropertyDetailsPage(viewModel.PropertyId);
+        }
+
         public IEnumerable<Insurer> GetAllInsurers()
         {
-            return _propertyService.GetAllInsurers();
+            using var propertyService = _serviceProvider.GetPropertyService();
+
+            return propertyService.GetAllInsurers();
         }
 
         public void AddAgent(Agent agent)
         {
-            _propertyService.AddAgent(agent);
+            using var propertyService = _serviceProvider.GetPropertyService();
+
+            propertyService.AddAgent(agent);
         }
 
         public IEnumerable<Broker> GetAllBrokers()
         {
-            return _propertyService.GetAllBrokers();
+            using var propertyService = _serviceProvider.GetPropertyService();
+
+            return propertyService.GetAllBrokers();
         }
 
         public void AddOwner(Owner owner)
         {
-            _propertyService.AddOwner(owner);
+            using var propertyService = _serviceProvider.GetPropertyService();
+
+            propertyService.AddOwner(_mapper.Map<Owner>(owner));
         }
 
         public IEnumerable<Owner> GetAllOwners()
         {
-            return _propertyService.GetAllOwners();
+            using var propertyService = _serviceProvider.GetPropertyService();
+
+            return propertyService.GetAllOwners();
         }
 
         public void AddInsurer(Insurer insurer)
         {
-            _propertyService.AddInsurer(insurer);
+            using var propertyService = _serviceProvider.GetPropertyService();
+
+            propertyService.AddInsurer(insurer);
         }
 
         public void AddBroker(Broker broker)
         {
-            _propertyService.AddBroker(broker);
+            using var propertyService = _serviceProvider.GetPropertyService();
+
+            propertyService.AddBroker(broker);
         }
 
-        public void AddInsurance(NewInsuranceViewModel insuranceViewModel)
+        public NewInsurancePolicyViewModel GetNewInsurancePolicyViewModel(int propertyId)
         {
-            _propertyService.AddInsurance(new Insurance
+            using var propertyService = _serviceProvider.GetPropertyService();
+
+            return new NewInsurancePolicyViewModel
             {
-                PropertyId = insuranceViewModel.PropertyId,
-                StartDate = insuranceViewModel.StartDate,
-                EndDate = insuranceViewModel.EndDate,
-                BrokerId = insuranceViewModel.Broker.BrokerId,
-                InsurerId = insuranceViewModel.Insurer.InsurerId
-            });
+                PropertyId = propertyId,
+                Brokers = propertyService.GetAllBrokers(),
+                Insurers = propertyService.GetAllInsurers()
+            };
         }
 
-        public InsuranceViewModel GetLatestInsurance(int propertyId)
+        public void AddInsurancePolicy(NewInsurancePolicyViewModel viewModel)
         {
-            return CreateInsuranceViewModel(_propertyService.GetLatestInsurance(propertyId));
+            using var propertyService = _serviceProvider.GetPropertyService();
+
+            propertyService.AddInsurancePolicy(_mapper.Map<InsurancePolicy>(viewModel));
         }
 
-        public void AddElectricalInspectionCertificate(ElectricalInspectionCertificate newCertificate)
+        public InsurancePolicy GetLatestInsurancePolicy(int propertyId)
         {
-            _propertyService.AddElectricalInspectionCertificate(newCertificate);
+            using var propertyService = _serviceProvider.GetPropertyService();
+
+            return propertyService.GetLatestInsurancePolicy(propertyId);
+        }
+
+        public void AddElectricalInspectionCertificate(int propertyId, ElectricalInspectionCertificate certificate)
+        {
+            using var propertyService = _serviceProvider.GetPropertyService();
+
+            propertyService.AddElectricalInspectionCertificate(propertyId, certificate);
+        }
+
+        public void EditPropertyPage(int propertyId)
+        {
+            using var propertyService = _serviceProvider.GetPropertyService();
+            using var imageService = _serviceProvider.GetImageService();
+
+            var property = propertyService.GetProperty(propertyId);
+
+            var viewModel = _mapper.Map<EditPropertyViewModel>(property);
+            viewModel.Owners = new ObservableCollection<Owner>(propertyService.GetAllOwners());
+
+            if (viewModel.ImageId is int imageId)
+                viewModel.ImagePath = imageService.GetImagePath(imageId);
+
+            _mainWindow.Navigate(new EditPropertyPage(this, viewModel));
         }
 
         public ElectricalInspectionCertificate GetLatestElectricalInspectionCertificate(int propertyId)
         {
-            return _propertyService.GetLatestElectricalInspectionCertificate(propertyId);
+            using var propertyService = _serviceProvider.GetPropertyService();
+            
+            return propertyService.GetLatestElectricalInspectionCertificate(propertyId);
         }
 
-        public void AddGasSafetyCertificate(GasSafetyCertificate newCertificate)
+        public void AddGasSafetyCertificate(int propertyId, GasSafetyCertificate certificate)
         {
-            _propertyService.AddGasSafetyCertificate(newCertificate);
+            using var propertyService = _serviceProvider.GetPropertyService();
+
+            propertyService.AddGasSafetyCertificate(propertyId, certificate);
         }
 
         public GasSafetyCertificate GetLatestGasSafetyCertificate(int propertyId)
         {
-            return _propertyService.GetLatestGasSafetyCertificate(propertyId);
+            using var propertyService = _serviceProvider.GetPropertyService();
+            
+            return propertyService.GetLatestGasSafetyCertificate(propertyId);
         }
 
-        public void AddEnergyPerformanceCertificate(EnergyPerformanceCertificate newCertificate)
+        public void AddEnergyPerformanceCertificate(int propertyId, EnergyPerformanceCertificate certificate)
         {
-            _propertyService.AddEnergyPerformanceCertificate(newCertificate);
+            using var propertyService = _serviceProvider.GetPropertyService();
+
+            propertyService.AddEnergyPerformanceCertificate(propertyId, certificate);
         }
 
         public EnergyPerformanceCertificate GetLatestEnergyPerformanceCertificate(int propertyId)
         {
-            return _propertyService.GetLatestEnergyPerformanceCertificate(propertyId);
+            using var propertyService = _serviceProvider.GetPropertyService();
+
+            return propertyService.GetLatestEnergyPerformanceCertificate(propertyId);
         }
 
-        public void AddExpense(Expense expense)
+        public void AddExpense(int propertyId, Expense expense)
         {
-            _propertyService.AddExpense(expense);
+            using var propertyService = _serviceProvider.GetPropertyService();
+
+            propertyService.AddExpense(propertyId, expense);
         }
 
-        public void AddImprovement(Improvement improvement)
+        public void AddImprovement(int propertyId, Improvement improvement)
         {
-            _propertyService.AddImprovement(improvement);
+            using var propertyService = _serviceProvider.GetPropertyService();
+
+            propertyService.AddImprovement(propertyId, improvement);
         }
 
-        public void EditImprovements(IEnumerable<Improvement> improvements)
+        public void UpdateImprovements(int propertyId, IEnumerable<Improvement> improvements)
         {
-            _propertyService.EditImprovements(improvements);
+            using var propertyService = _serviceProvider.GetPropertyService();
+
+            propertyService.UpdateImprovements(propertyId, improvements);
         }
 
-        public void DeleteImprovements(IEnumerable<Improvement> improvements)
+        public void UpdateExpenses(int propertyId, IEnumerable<Expense> expenses)
         {
-            _propertyService.DeleteImprovements(improvements);
-        }
+            using var propertyService = _serviceProvider.GetPropertyService();
 
-        public void EditExpenses(IEnumerable<Expense> expenses)
-        {
-            _propertyService.EditExpenses(expenses);
-        }
-
-        public void DeleteExpenses(IEnumerable<Expense> expenses)
-        {
-            _propertyService.DeleteExpenses(expenses);
-        }
-
-        private PropertyDetailsViewModel CreatePropertyDetailsViewModel(int propertyId)
-        {
-            var property = _propertyService.GetProperty(propertyId);
-
-            var tenancy = _propertyService.GetCurrentTenancy(propertyId);
-
-            var insurance = _propertyService.GetLatestInsurance(propertyId);
-
-            return new PropertyDetailsViewModel
-            {
-                PropertyId = property.PropertyId,
-                PropertyType = property.PropertyType,
-                Owner = _propertyService.GetOwner(property.OwnerId)?.Name,
-                PurchaseDate = property.PurchaseDate,
-                PurchasePrice = property.PurchasePrice,
-                StreetAddress1 = property.StreetAddress1,
-                StreetAddress2 = property.StreetAddress2,
-                Locality = property.Locality,
-                City = property.City,
-                County = property.County,
-                Country = property.Country,
-                Postcode = property.Postcode,
-                CurrentTenancy = tenancy == null ? null : CreateTenancyViewModel(tenancy),
-                ElectricalInspectionCertificate = _propertyService.GetLatestElectricalInspectionCertificate(propertyId),
-                GasSafetyCertificate = _propertyService.GetLatestGasSafetyCertificate(propertyId),
-                EnergyPerformanceCertificate = _propertyService.GetLatestEnergyPerformanceCertificate(propertyId),
-                Insurance = insurance == null ? null : CreateInsuranceViewModel(insurance),
-                Expenses = new ObservableCollection<Expense>(_propertyService.GetExpenses(propertyId)),
-                Improvements = new ObservableCollection<Improvement>(_propertyService.GetImprovements(propertyId)),
-                PurchaseCosts = _propertyService.GetPurchaseCosts(propertyId).ToList()
-            };
-        }
-
-        private InsuranceViewModel CreateInsuranceViewModel(Insurance insurance) => new InsuranceViewModel
-        {
-            StartDate = insurance.StartDate,
-            EndDate = insurance.EndDate,
-            Insurer = _propertyService.GetInsurer(insurance.InsurerId),
-            Broker = _propertyService.GetBroker(insurance.BrokerId)
-        };
-
-        private TenancyViewModel CreateTenancyViewModel(Tenancy tenancy)
-        {
-            double? accountBalance = tenancy == null ? (double?)null : _rentAssistant.GetAccountBalance(tenancy.TenancyId);
-            double? outstandingBalance = accountBalance == null ? null : (accountBalance >= 0 ? 0 : -1 * accountBalance);
-
-            return new TenancyViewModel
-            {
-                TenancyId = tenancy.TenancyId,
-                StartDate = tenancy.StartDate,
-                EndDate = tenancy.EndDate,
-                Tenants = new List<Tenant>(_propertyService.GetTenants(tenancy.TenancyId)),
-                NextPaymentDue = _rentAssistant.GetNextPaymentDate(tenancy.TenancyId),
-                OutstandingBalance = outstandingBalance
-            };
-        }
-
-        private TenancyDetailsViewModel CreateTenancyDetailsViewModel(int tenancyId)
-        {
-            var tenancy = _propertyService.GetTenancy(tenancyId);
-
-            var property = _propertyService.GetProperty(tenancy.PropertyId);
-
-            double accountBalance = _rentAssistant.GetAccountBalance(tenancy.TenancyId);
-            double outstandingBalance = accountBalance >= 0 ? 0 : -1 * accountBalance;
-
-            return new TenancyDetailsViewModel
-            {
-                TenancyId = tenancy.TenancyId,
-                PropertyId = tenancy.PropertyId,
-                StreetAddress1 = property.StreetAddress1,
-                StreetAddress2 = property.StreetAddress2,
-                Locality = property.Locality,
-                City = property.City,
-                County = property.County,
-                Country = property.Country,
-                Postcode = property.Postcode,
-                CurrentTenants = new List<Tenant>(_propertyService.GetTenants(tenancy.TenancyId)),
-                FirstPayment = tenancy.FirstPayment,
-                NextPaymentDue = _rentAssistant.GetNextPaymentDate(tenancy.TenancyId),
-                OutstandingBalance = outstandingBalance,
-                StartDate = tenancy.StartDate,
-                EndDate = tenancy.EndDate,
-                PaymentFrequency = tenancy.PaymentFrequency,
-                Rates = new List<Rate>(_propertyService.GetRates(tenancyId)),
-                AccountEntries = _rentAssistant.GetAllAccountEntries(tenancyId)
-            };
-        }
-
-        private PropertySummaryViewModel CreatePropertySummaryViewModel(Property property)
-        {
-            int propertyId = property.PropertyId;
-
-            var electricalCertificate = _propertyService.GetLatestElectricalInspectionCertificate(propertyId);
-            var gasCertificate = _propertyService.GetLatestGasSafetyCertificate(propertyId);
-            var energyCertificate = _propertyService.GetLatestEnergyPerformanceCertificate(propertyId);
-            var insurance = _propertyService.GetLatestInsurance(propertyId);
-
-            var tenancy = _propertyService.GetCurrentTenancy(propertyId);
-            var tenants = tenancy == null ? null : _propertyService.GetTenants(tenancy.TenancyId)
-                .Select(t => t.Name)
-                .ToList();
-
-            double? accountBalance = tenancy == null ? (double?)null : _rentAssistant.GetAccountBalance(tenancy.TenancyId);
-            double? outstandingBalance = accountBalance == null ? null : (accountBalance >= 0 ? 0 : -1 * accountBalance);
-
-            DateTime? nextPaymentDate = tenancy == null ? null : _rentAssistant.GetNextPaymentDate(tenancy.TenancyId);
-
-            return new PropertySummaryViewModel
-            {
-                PropertyId = property.PropertyId,
-                StreetAddress1 = property.StreetAddress1,
-                StreetAddress2 = property.StreetAddress2,
-                Locality = property.Locality,
-                City = property.City,
-                County = property.County,
-                Country = property.Country,
-                Postcode = property.Postcode,
-                ElectricalInspectionExpiry = electricalCertificate?.ExpiryDate,
-                GasSafetyExpiry = gasCertificate?.ExpiryDate,
-                EpcExpiry = energyCertificate?.ExpiryDate,
-                InsuranceEndDate = insurance?.EndDate,
-                NextPaymentDue = nextPaymentDate,
-                OutstandingBalance = outstandingBalance,
-                Tenants = tenants
-            };
-        }
-
-        private AddPropertyViewModel CreateAddPropertyViewModel() => new AddPropertyViewModel
-        {
-            Owners = new ObservableCollection<Owner>(_propertyService.GetAllOwners())
-        };
-
-        private AddTenancyViewModel CreateAddTenancyViewModel(int propertyId) => new AddTenancyViewModel
-        {
-            PropertyId = propertyId,
-            Agents = new ObservableCollection<Agent>(_propertyService.GetAllAgents())
-        };
-
-        private EditTenancyViewModel CreateEditTenancyViewModel(int tenancyId)
-        {
-            var tenancy = _propertyService.GetTenancy(tenancyId);
-
-            var agents = _propertyService.GetAllAgents();
-
-            return new EditTenancyViewModel
-            {
-                TenancyId = tenancyId,
-                Tenants = new ObservableCollection<Tenant>(_propertyService.GetTenants(tenancyId)),
-                //Agent = agents.Where(a => a.AgentId == tenancy.AgentId).First(),
-                AgentId = tenancy.AgentId,
-                FirstPayment = tenancy.FirstPayment,
-                PaymentFrequency = tenancy.PaymentFrequency,
-                DepositAmount = tenancy.Deposit,
-                StartDate = tenancy.StartDate,
-                EndDate = tenancy.EndDate,
-                Rates = new ObservableCollection<Rate>(_propertyService.GetRates(tenancyId)),
-                Agents = new ObservableCollection<Agent>(agents)
-            };
+            propertyService.UpdateExpenses(propertyId, expenses);
         }
     }
 }

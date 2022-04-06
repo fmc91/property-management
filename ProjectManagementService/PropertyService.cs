@@ -1,445 +1,296 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Linq;
-using Microsoft.EntityFrameworkCore;
+using AutoMapper;
 using PropertyManagementData;
-using PropertyManagementCommon.Model;
+using PropertyManagementService.Model;
+using Microsoft.EntityFrameworkCore;
+using AgentEntity = PropertyManagementData.Model.Agent;
+using BrokerEntity = PropertyManagementData.Model.Broker;
+using InsurerEntity = PropertyManagementData.Model.Insurer;
+using OwnerEntity = PropertyManagementData.Model.Owner;
+using PropertyEntity = PropertyManagementData.Model.Property;
+using TenancyEntity = PropertyManagementData.Model.Tenancy;
+using ScheduledPaymentEntity = PropertyManagementData.Model.ScheduledPayment;
+using InsurancePolicyEntity = PropertyManagementData.Model.InsurancePolicy;
+using ElectricalInspectionCertificateEntity = PropertyManagementData.Model.ElectricalInspectionCertificate;
+using GasSafetyCertificateEntity = PropertyManagementData.Model.GasSafetyCertificate;
+using EnergyPerformanceCertificateEntity = PropertyManagementData.Model.EnergyPerformanceCertificate;
+using ExpenseEntity = PropertyManagementData.Model.Expense;
+using ImprovementEntity = PropertyManagementData.Model.Improvement;
+using AccountEntryEntity = PropertyManagementData.Model.AccountEntry;
 
 namespace PropertyManagementService
 {
     public class PropertyService : IDisposable
     {
-        private readonly PropertyManagementContext _db;
+        private PropertyManagementContext _db;
 
-        public PropertyService(PropertyManagementContext db)
+        private IMapper _mapper;
+
+        public PropertyService(PropertyManagementContext db, IMapper mapper)
         {
             _db = db;
+            _mapper = mapper;
         }
 
-        public Property GetProperty(int propertyId)
+        public List<Agent> GetAllAgents()
         {
-            return _db.Property
-                .AsNoTracking()
-                .Where(p => p.PropertyId == propertyId)
-                .SingleOrDefault();
-        }
-
-        public Owner GetOwner(int ownerId)
-        {
-            return _db.Owner
-                .AsNoTracking()
-                .Where(o => o.OwnerId == ownerId)
-                .SingleOrDefault();
+            return _db.Agent.Select(a => _mapper.Map<Agent>(a))
+                .ToList();
         }
 
         public Agent GetAgent(int agentId)
         {
-            return _db.Agent
-                .AsNoTracking()
-                .Where(i => i.AgentId == agentId)
-                .SingleOrDefault();
-        }
-
-        public Insurer GetInsurer(int insurerId)
-        {
-            return _db.Insurer
-                .AsNoTracking()
-                .Where(i => i.InsurerId == insurerId)
-                .SingleOrDefault();
-        }
-
-        public Broker GetBroker(int brokerId)
-        {
-            return _db.Broker
-                .AsNoTracking()
-                .Where(b => b.BrokerId == brokerId)
-                .SingleOrDefault();
-        }
-
-        public Tenancy GetTenancy(int tenancyId)
-        {
-            return _db.Tenancy
-                .AsNoTracking()
-                .Where(t => t.TenancyId == tenancyId)
-                .SingleOrDefault();
-        }
-
-        public IEnumerable<Property> GetAllProperties()
-        {
-            return _db.Property.AsNoTracking();
-        }
-
-        public IEnumerable<Agent> GetAllAgents()
-        {
-            return _db.Agent.AsNoTracking();
-        }
-
-        public IEnumerable<Broker> GetAllBrokers()
-        {
-            return _db.Broker.AsNoTracking();
-        }
-
-        public IEnumerable<Insurer> GetAllInsurers()
-        {
-            return _db.Insurer.AsNoTracking();
-        }
-
-        public IEnumerable<Owner> GetAllOwners()
-        {
-            return _db.Owner.AsNoTracking();
-        }
-
-        public IEnumerable<Improvement> GetImprovements(int propertyId)
-        {
-            return _db.Improvement.AsNoTracking()
-                .Where(i => i.PropertyId == propertyId);
-        }
-
-        public IEnumerable<PurchaseCost> GetPurchaseCosts(int propertyId)
-        {
-            return _db.PurchaseCost.AsNoTracking()
-                .Where(c => c.PropertyId == propertyId);
-        }
-
-        public IEnumerable<Expense> GetExpenses(int propertyId)
-        {
-            return _db.Expense.AsNoTracking()
-                .Where(e => e.PropertyId == propertyId);
-        }
-
-        public IEnumerable<Tenant> GetTenants(int tenancyId)
-        {
-            return _db.Tenant.AsNoTracking()
-                .Where(t => t.TenancyId == tenancyId);
-        }
-
-        public IEnumerable<ActualPayment> GetActualPayments(int tenancyId)
-        {
-            return _db.ActualPayment.AsNoTracking()
-                .Where(p => p.TenancyId == tenancyId);
-        }
-
-        public IEnumerable<ScheduledPayment> GetScheduledPayments(int tenancyId)
-        {
-            return _db.ScheduledPayment.AsNoTracking()
-                .Where(p => p.TenancyId == tenancyId);
-        }
-
-        public void DeleteScheduledPaymentsAfterDate(int tenancyId, DateTime date)
-        {
-            var paymentsToDelete = _db.ScheduledPayment
-                .Where(p => p.TenancyId == tenancyId && p.Date > date);
-
-            _db.ScheduledPayment.RemoveRange(paymentsToDelete);
-
-            _db.SaveChanges();
-        }
-
-        public IEnumerable<Rate> GetRates(int tenancyId)
-        {
-            return _db.Rate.AsNoTracking()
-                .Where(p => p.TenancyId == tenancyId);
-        }
-
-        public Rate GetCurrentRate(int tenancyId)
-        {
-            return _db.Rate.AsNoTracking()
-                .Where(rp =>
-                    rp.TenancyId == tenancyId &&
-                    rp.StartDate <= DateTime.Today &&
-                    rp.EndDate >= DateTime.Today)
-                .FirstOrDefault();
-        }
-
-        public Tenancy GetCurrentTenancy(int propertyId)
-        {
-            return _db.Tenancy.AsNoTracking()
-                .Where(t =>
-                    t.PropertyId == propertyId &&
-                    t.StartDate <= DateTime.Today &&
-                    t.EndDate >= DateTime.Today)
-                .FirstOrDefault();
-        }
-
-        public void AddImprovement(Improvement improvement)
-        {
-            _db.Improvement.Add(improvement);
-            _db.SaveChanges();
-
-            _db.Entry(improvement).State = EntityState.Detached;
-        }
-
-        public void AddPurchaseCost(PurchaseCost purchaseCost)
-        {
-            _db.PurchaseCost.Add(purchaseCost);
-            _db.SaveChanges();
-
-            _db.Entry(purchaseCost).State = EntityState.Detached;
-        }
-
-        public void AddPurchaseCosts(IEnumerable<PurchaseCost> purchaseCosts)
-        {
-            _db.PurchaseCost.AddRange(purchaseCosts);
-            _db.SaveChanges();
-
-            foreach (var pc in purchaseCosts)
-                _db.Entry(pc).State = EntityState.Detached;
-        }
-
-        public void AddExpense(Expense expense)
-        {
-            _db.Expense.Add(expense);
-            _db.SaveChanges();
-
-            _db.Entry(expense).State = EntityState.Detached;
-        }
-
-        public void AddOwner(Owner owner)
-        {
-            _db.Owner.Add(owner);
-            _db.SaveChanges();
-
-            _db.Entry(owner).State = EntityState.Detached;
-        }
-
-        public void AddTenancy(Tenancy tenancy)
-        {
-            _db.Tenancy.Add(tenancy);
-            _db.SaveChanges();
-
-            _db.Entry(tenancy).State = EntityState.Detached;
-        }
-
-        public void AddRates(IEnumerable<Rate> rentPeriods)
-        {
-            _db.Rate.AddRange(rentPeriods);
-            _db.SaveChanges();
-
-            foreach (var rp in rentPeriods)
-                _db.Entry(rp).State = EntityState.Detached;
-        }
-
-        public void AddScheduledPayment(ScheduledPayment scheduledPayment)
-        {
-            _db.ScheduledPayment.Add(scheduledPayment);
-            _db.SaveChanges();
-
-            _db.Entry(scheduledPayment).State = EntityState.Detached;
-        }
-
-        public void AddScheduledPayments(IEnumerable<ScheduledPayment> scheduledPayments)
-        {
-            _db.ScheduledPayment.AddRange(scheduledPayments);
-            _db.SaveChanges();
-
-            foreach (var p in scheduledPayments)
-                _db.Entry(p).State = EntityState.Detached;
-        }
-
-        public void AddRate(Rate rentPeriod)
-        {
-            _db.Rate.Add(rentPeriod);
-            _db.SaveChanges();
-
-            _db.Entry(rentPeriod).State = EntityState.Detached;
-        }
-
-        public void AddTenants(IEnumerable<Tenant> tenants)
-        {
-            _db.Tenant.AddRange(tenants);
-            _db.SaveChanges();
-
-            foreach (var t in tenants)
-                _db.Entry(t).State = EntityState.Detached;
-        }
-
-        public void AddTenant(Tenant tenant)
-        {
-            _db.Tenant.Add(tenant);
-            _db.SaveChanges();
-
-            _db.Entry(tenant).State = EntityState.Detached;
-        }
-
-        public void AddProperty(Property property)
-        {
-            _db.Property.Add(property);
-            _db.SaveChanges();
-
-            _db.Entry(property).State = EntityState.Detached;
+            return _mapper.Map<Agent>(_db.Agent.Find(agentId));
         }
 
         public void AddAgent(Agent agent)
         {
-            _db.Agent.Add(agent);
+            _db.Agent.Add(_mapper.Map<AgentEntity>(agent));
             _db.SaveChanges();
+        }
 
-            _db.Entry(agent).State = EntityState.Detached;
+        public List<Broker> GetAllBrokers()
+        {
+            return _db.Broker.Select(b => _mapper.Map<Broker>(b))
+                .ToList();
+        }
+
+        public Broker GetBroker(int brokerId)
+        {
+            return _mapper.Map<Broker>(_db.Broker.Find(brokerId));
         }
 
         public void AddBroker(Broker broker)
         {
-            _db.Broker.Add(broker);
+            _db.Broker.Add(_mapper.Map<BrokerEntity>(broker));
             _db.SaveChanges();
+        }
 
-            _db.Entry(broker).State = EntityState.Detached;
+        public List<Owner> GetAllOwners()
+        {
+            return _db.Owner.Select(i => _mapper.Map<Owner>(i))
+                .ToList();
+        }
+
+        public Owner GetOwner(int ownerId)
+        {
+            return _mapper.Map<Owner>(_db.Broker.Find(ownerId));
+        }
+
+        public void AddOwner(Owner owner)
+        {
+            _db.Owner.Add(_mapper.Map<OwnerEntity>(owner));
+            _db.SaveChanges();
+        }
+
+        public List<Insurer> GetAllInsurers()
+        {
+            return _db.Insurer.Select(i => _mapper.Map<Insurer>(i))
+                .ToList();
+        }
+
+        public Insurer GetInsurer(int insurerId)
+        {
+            return _mapper.Map<Insurer>(_db.Insurer.Find(insurerId));
         }
 
         public void AddInsurer(Insurer insurer)
         {
-            _db.Insurer.Add(insurer);
+            _db.Insurer.Add(_mapper.Map<InsurerEntity>(insurer));
             _db.SaveChanges();
-
-            _db.Entry(insurer).State = EntityState.Detached;
         }
 
-        public void AddInsurance(Insurance insurance)
+        public IEnumerable<Property> GetAllProperties()
         {
-            _db.Insurance.Add(insurance);
-            _db.SaveChanges();
-
-            _db.Entry(insurance).State = EntityState.Detached;
+            return _mapper.Map<IEnumerable<Property>>(_db.Property);
         }
 
-        public void AddElectricalInspectionCertificate(ElectricalInspectionCertificate certificate)
+        public Property GetProperty(int propertyId)
         {
-            _db.ElectricalInspectionCertificate.Add(certificate);
-            _db.SaveChanges();
-
-            _db.Entry(certificate).State = EntityState.Detached;
+            return _mapper.Map<Property>(_db.Property.Find(propertyId));
         }
 
-        public void AddGasSafetyCertificate(GasSafetyCertificate certificate)
+        public void AddProperty(Property property)
         {
-            _db.GasSafetyCertificate.Add(certificate);
-            _db.SaveChanges();
+            var propertyEntity = _mapper.Map<PropertyEntity>(property);
+            propertyEntity.Owner = _mapper.Map<OwnerEntity>(property.Owner);
 
-            _db.Entry(certificate).State = EntityState.Detached;
+            _db.Property.Update(propertyEntity);
+
+            if (propertyEntity.Image != null)
+                _db.Entry(propertyEntity.Image).Property(i => i.FileName).IsModified = false;
+
+            _db.SaveChanges();
         }
 
-        public void AddEnergyPerformanceCertificate(EnergyPerformanceCertificate certificate)
+        public void UpdateProperty(Property property)
         {
-            _db.EnergyPerformanceCertificate.Add(certificate);
-            _db.SaveChanges();
+            var propertyEntity = _db.Property.Find(property.PropertyId);
+            _mapper.Map(property, propertyEntity);
 
-            _db.Entry(certificate).State = EntityState.Detached;
+            if (property.Owner.OwnerId == propertyEntity.Owner.OwnerId)
+                _mapper.Map(property.Owner, propertyEntity.Owner);
+            else
+                propertyEntity.Owner = _mapper.Map<OwnerEntity>(property.Owner);
+
+            if (propertyEntity.Image != null)
+                _db.Entry(propertyEntity.Image).Property(i => i.FileName).IsModified = false;
+
+            _db.SaveChanges();
         }
 
-        public void AddActualPayment(ActualPayment rentPayment)
+        public Tenancy GetTenancy(int tenancyId)
         {
-            _db.ActualPayment.Add(rentPayment);
-            _db.SaveChanges();
-
-            _db.Entry(rentPayment).State = EntityState.Detached;
+            return _mapper.Map<Tenancy>(_db.Tenancy.Find(tenancyId));
         }
 
-        public Insurance GetLatestInsurance(int propertyId)
+        public void AddTenancy(Tenancy tenancy)
         {
-            return _db.Insurance.AsNoTracking()
-                .Where(c => c.PropertyId == propertyId && c.StartDate <= DateTime.Today)
-                .OrderByDescending(c => c.EndDate)
-                .FirstOrDefault();
+            var tenancyEntity = _mapper.Map<TenancyEntity>(tenancy);
+            tenancyEntity.Agent = _mapper.Map<AgentEntity>(tenancy.Agent);
+
+            _db.Property.Find(tenancy.PropertyId)
+                .Tenancies.Add(tenancyEntity);
+            _db.SaveChanges();
+        }
+
+        public void UpdateTenancy(Tenancy tenancy)
+        {
+            var tenancyEntity = _db.Tenancy.Find(tenancy.TenancyId);
+            _mapper.Map(tenancy, tenancyEntity);
+
+            if (tenancy.Agent.AgentId == tenancyEntity.AgentId)
+                _mapper.Map(tenancy.Agent, tenancyEntity.Agent);
+            else
+                tenancyEntity.Agent = _mapper.Map<AgentEntity>(tenancy.Agent);
+            
+            _db.SaveChanges();
+        }
+
+        public void AddAccountEntry(int tenancyId, AccountEntry accountEntry)
+        {
+            _db.Tenancy.Find(tenancyId)
+                .AccountEntries.Add(_mapper.Map<AccountEntryEntity>(accountEntry));
+            _db.SaveChanges();
+        }
+
+        public IEnumerable<ScheduledPayment> GetActionableScheduledPayments()
+        {
+            return _db.ScheduledPayment
+                .Where(p => !p.Processed && p.Date <= DateTime.Today)
+                .OrderBy(p => p.Date)
+                .Select(p => _mapper.Map<ScheduledPayment>(p));
+        }
+
+        public void AddScheduledPayments(IEnumerable<ScheduledPayment> scheduledPayments)
+        {
+            _db.ScheduledPayment.AddRange(scheduledPayments.Select(p => _mapper.Map<ScheduledPaymentEntity>(p)));
+        }
+
+        public void UpdateScheduledPayment(ScheduledPayment scheduledPayment)
+        {
+            var scheduledPaymentEntity = _db.ScheduledPayment.Find(scheduledPayment.ScheduledPaymentId);
+            _mapper.Map(scheduledPayment, scheduledPaymentEntity);
+            _db.ScheduledPayment.Update(scheduledPaymentEntity);
+            _db.SaveChanges();
+        }
+
+        public InsurancePolicy GetLatestInsurancePolicy(int propertyId)
+        {
+            return _mapper.Map<InsurancePolicy>(_db.Insurance
+                .Where(i => i.PropertyId == propertyId && i.StartDate <= DateTime.Today)
+                .OrderByDescending(i => i.EndDate)
+                .FirstOrDefault());
+        }
+
+        public void AddInsurancePolicy(InsurancePolicy insurancePolicy)
+        {
+            _db.Property.Find(insurancePolicy.PropertyId)
+                .InsurancePolicies.Add(_mapper.Map<InsurancePolicyEntity>(insurancePolicy));
+            _db.SaveChanges();
         }
 
         public ElectricalInspectionCertificate GetLatestElectricalInspectionCertificate(int propertyId)
         {
-            return _db.ElectricalInspectionCertificate.AsNoTracking()
+            return _mapper.Map<ElectricalInspectionCertificate>(_db.ElectricalInspectionCertificate
                 .Where(c => c.PropertyId == propertyId && c.IssueDate <= DateTime.Today)
                 .OrderByDescending(c => c.ExpiryDate)
-                .FirstOrDefault();
+                .FirstOrDefault());
+        }
+
+        public void AddElectricalInspectionCertificate(int propertyId, ElectricalInspectionCertificate certificate)
+        {
+            _db.Property.Find(propertyId)
+                .ElectricalInspectionCertificates.Add(_mapper.Map<ElectricalInspectionCertificateEntity>(certificate));
+            _db.SaveChanges();
         }
 
         public GasSafetyCertificate GetLatestGasSafetyCertificate(int propertyId)
         {
-            return _db.GasSafetyCertificate.AsNoTracking()
+            return _mapper.Map<GasSafetyCertificate>(_db.GasSafetyCertificate
                 .Where(c => c.PropertyId == propertyId && c.IssueDate <= DateTime.Today)
                 .OrderByDescending(c => c.ExpiryDate)
-                .FirstOrDefault();
+                .FirstOrDefault());
+        }
+
+        public void AddGasSafetyCertificate(int propertyId, GasSafetyCertificate certificate)
+        {
+            _db.Property.Find(propertyId)
+                .GasSafetyCertificates.Add(_mapper.Map<GasSafetyCertificateEntity>(certificate));
+            _db.SaveChanges();
+        }
+
+        public void AddImprovement(int propertyId, Improvement improvement)
+        {
+            _db.Property.Find(propertyId)
+                .Improvements.Add(_mapper.Map<ImprovementEntity>(improvement));
+            _db.SaveChanges();
+        }
+
+        public void UpdateImprovements(int propertyId, IEnumerable<Improvement> improvements)
+        {
+            var propertyEntity = _db.Property.Find(propertyId);
+            _mapper.Map(improvements, propertyEntity.Improvements);
+            //_db.Property.Update(propertyEntity);
+            _db.SaveChanges();
+        }
+
+        public void AddExpense(int propertyId, Expense expense)
+        {
+            _db.Property.Find(propertyId)
+                .Expenses.Add(_mapper.Map<ExpenseEntity>(expense));
+            _db.SaveChanges();
+        }
+
+        public void UpdateExpenses(int propertyId, IEnumerable<Expense> expenses)
+        {
+            var propertyEntity = _db.Property.Find(propertyId);
+            _mapper.Map(expenses, propertyEntity.Expenses);
+            //_db.Property.Update(propertyEntity);
+            _db.SaveChanges();
         }
 
         public EnergyPerformanceCertificate GetLatestEnergyPerformanceCertificate(int propertyId)
         {
-            return _db.EnergyPerformanceCertificate.AsNoTracking()
+            return _mapper.Map<EnergyPerformanceCertificate>(_db.EnergyPerformanceCertificate
                 .Where(c => c.PropertyId == propertyId && c.IssueDate <= DateTime.Today)
                 .OrderByDescending(c => c.ExpiryDate)
-                .FirstOrDefault();
+                .FirstOrDefault());
+        }
+
+        public void AddEnergyPerformanceCertificate(int propertyId, EnergyPerformanceCertificate certificate)
+        {
+            _db.Property.Find(propertyId)
+                .EnergyPerformanceCertificates.Add(_mapper.Map<EnergyPerformanceCertificateEntity>(certificate));
+            _db.SaveChanges();
         }
 
         public void Dispose()
         {
             _db.Dispose();
-        }
-
-        public void DeleteAllScheduledPayments(int tenancyId)
-        {
-            var payments = _db.ScheduledPayment.AsNoTracking()
-                    .Where(p => p.TenancyId == tenancyId);
-
-            _db.ScheduledPayment.RemoveRange(payments);
-        }
-
-        public void EditTenancy(Tenancy tenancy)
-        {
-            _db.Update(tenancy);
-            _db.SaveChanges();
-
-            _db.Entry(tenancy).State = EntityState.Detached;
-        }
-
-        public void EditTenants(IEnumerable<Tenant> tenants)
-        {
-            _db.UpdateRange(tenants);
-            _db.SaveChanges();
-
-            foreach (var tenant in tenants) _db.Entry(tenant).State = EntityState.Detached;
-        }
-
-        public void DeleteTenants(IEnumerable<Tenant> tenants)
-        {
-            _db.Tenant.RemoveRange(tenants);
-            _db.SaveChanges();
-        }
-
-        public void EditRates(IEnumerable<Rate> rates)
-        {
-            _db.UpdateRange(rates);
-            _db.SaveChanges();
-            
-            foreach (var rate in rates) _db.Entry(rate).State = EntityState.Detached;
-        }
-
-        public void DeleteRates(IEnumerable<Rate> rates)
-        {
-            _db.Rate.RemoveRange(rates);
-            _db.SaveChanges();
-        }
-
-        public void EditImprovements(IEnumerable<Improvement> improvements)
-        {
-            _db.UpdateRange(improvements);
-            _db.SaveChanges();
-
-            foreach (var improvement in improvements) _db.Entry(improvement).State = EntityState.Detached;
-        }
-
-        public void DeleteImprovements(IEnumerable<Improvement> improvements)
-        {
-            _db.Improvement.RemoveRange(improvements);
-            _db.SaveChanges();
-        }
-
-        public void EditExpenses(IEnumerable<Expense> expenses)
-        {
-            _db.UpdateRange(expenses);
-            _db.SaveChanges();
-
-            foreach (var expense in expenses) _db.Entry(expense).State = EntityState.Detached;
-        }
-
-        public void DeleteExpenses(IEnumerable<Expense> expenses)
-        {
-            _db.Expense.RemoveRange(expenses);
-            _db.SaveChanges();
         }
     }
 }

@@ -4,6 +4,8 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:PropertyManagementUi"
+      xmlns:common="clr-namespace:PropertyManagementCommon;assembly=PropertyManagementCommon"
+      xmlns:sys="clr-namespace:System;assembly=mscorlib"
       mc:Ignorable="d" 
       d:DesignHeight="800" d:DesignWidth="1300"
       WindowTitle="Add Tenancy">
@@ -146,21 +148,21 @@
                             <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
 
-                        <TextBlock Grid.Row="0" Grid.Column="0" FontWeight="Bold" Text="Tenancy Start" VerticalAlignment="Center"
+                        <TextBlock Grid.Row="0" Grid.Column="0" FontWeight="Bold" Text="Start Date" VerticalAlignment="Center"
                                    Margin="0 0 0 4"/>
-                        <DatePicker Grid.Row="0" Grid.Column="1" Margin="0 0 0 4" SelectedDate="{Binding StartDate, Mode=TwoWay}"/>
-                        <TextBlock Grid.Row="1" Grid.Column="0" FontWeight="Bold" Text="Tenancy End" VerticalAlignment="Center"
+                        <DatePicker Grid.Row="0" Grid.Column="1" Margin="0 0 0 4" SelectedDate="{Binding StartDate, Mode=OneWayToSource, FallbackValue={x:Static sys:DateTime.Today}}"/>
+                        <TextBlock Grid.Row="1" Grid.Column="0" FontWeight="Bold" Text="End Date" VerticalAlignment="Center"
                                    Margin="0 0 0 4"/>
-                        <DatePicker Grid.Row="1" Grid.Column="1" Margin="0 0 0 4" SelectedDate="{Binding EndDate, Mode=TwoWay}"/>
+                        <DatePicker Grid.Row="1" Grid.Column="1" Margin="0 0 0 4" SelectedDate="{Binding EndDate, Mode=OneWayToSource, FallbackValue={x:Static sys:DateTime.Today}}"/>
                         <TextBlock Grid.Row="2" Grid.Column="0" FontWeight="Bold" Text="Payment Frequency" VerticalAlignment="Center"
                                    Margin="0 0 0 4"/>
                         <ComboBox Grid.Row="2" Grid.Column="1" ItemsSource="{StaticResource PaymentFrequencyOptions}"
-                                  DisplayMemberPath="Value" SelectedValuePath="Key" SelectedValue="{Binding PaymentFrequency, Mode=TwoWay}" Margin="0 0 0 4"/>
+                                  DisplayMemberPath="Value" SelectedValuePath="Key" SelectedValue="{Binding PaymentFrequency, Mode=OneWayToSource, FallbackValue={x:Static common:PaymentFrequency.Monthly}}" Margin="0 0 0 4"/>
                         <TextBlock Grid.Row="3" Grid.Column="0" FontWeight="Bold" Text="First Payment" VerticalAlignment="Center"
                                    Margin="0 0 0 4"/>
-                        <DatePicker Grid.Row="3" Grid.Column="1" Margin="0 0 0 4" SelectedDate="{Binding FirstPayment, Mode=TwoWay}"/>
+                        <DatePicker Grid.Row="3" Grid.Column="1" Margin="0 0 0 4" SelectedDate="{Binding FirstPayment, Mode=OneWayToSource, FallbackValue={x:Static sys:DateTime.Today}}"/>
                         <TextBlock Grid.Row="4" Grid.Column="0" FontWeight="Bold" Text="Deposit Amount"/>
-                        <TextBox Grid.Row="4" Grid.Column="1" Text="{Binding DepositAmount, Mode=TwoWay}"/>
+                        <TextBox Grid.Row="4" Grid.Column="1" Text="{Binding Deposit, Mode=OneWayToSource, FallbackValue='0'}"/>
                     </Grid>
                 </Border>
 

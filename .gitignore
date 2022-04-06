@@ -1,5 +1,6 @@
-*.db
-Migrations/
-.vs/
 bin/
 obj/
+.vs/
+Migrations/
+*.db
+

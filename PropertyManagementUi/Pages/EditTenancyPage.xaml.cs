@@ -1,8 +1,7 @@
-﻿using PropertyManagementCommon.Model;
-using PropertyManagementService;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Windows;
@@ -14,6 +13,9 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using PropertyManagementService;
+using PropertyManagementService.Model;
+using PropertyManagementUi.ViewModels;
 
 namespace PropertyManagementUi
 {
@@ -23,6 +25,7 @@ namespace PropertyManagementUi
     public partial class EditTenancyPage : Page, INotifyPropertyChanged
     {
         private AppController _appController;
+
         private bool _addingAgent;
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -58,7 +61,10 @@ namespace PropertyManagementUi
 
         private void SaveButtonClick(object sender, RoutedEventArgs e)
         {
-            _appController.EditTenancy(ViewModel);
+            if (ViewModel.Agent == null || ViewModel.Tenants.Any(t => String.IsNullOrWhiteSpace(t.Name) || String.IsNullOrWhiteSpace(t.Telephone)))
+                return;
+
+            _appController.UpdateTenancy(ViewModel);
         }
 
         private void CancelButtonClick(object sender, RoutedEventArgs e)
@@ -68,11 +74,9 @@ namespace PropertyManagementUi
 
         private void AddTenantButtonClick(object sender, RoutedEventArgs e)
         {
-            var newTenant = new Tenant { TenancyId = ViewModel.TenancyId };
+            var newTenant = new Tenant();
 
             ViewModel.Tenants.Add(newTenant);
-
-            ViewModel.AddedTenants.Add(newTenant);
         }
 
         private void RemoveTenantButtonClick(object sender, RoutedEventArgs e)
@@ -80,21 +84,6 @@ namespace PropertyManagementUi
             var tenant = (Tenant)((Control)sender).Tag;
 
             ViewModel.Tenants.Remove(tenant);
-
-            if (ViewModel.AddedTenants.Contains(tenant))
-            {
-                ViewModel.AddedTenants.Remove(tenant);
-            }
-            else
-            {
-                if (!ViewModel.DeletedTenants.Contains(tenant))
-                {
-                    if (ViewModel.ModifiedTenants.Contains(tenant))
-                        ViewModel.ModifiedTenants.Remove(tenant);
-
-                    ViewModel.DeletedTenants.Add(tenant);
-                }
-            }
         }
 
         private void AddRateButtonClick(object sender, RoutedEventArgs e)
@@ -107,14 +96,11 @@ namespace PropertyManagementUi
 
             var newRate = new Rate
             {
-                TenancyId = ViewModel.TenancyId,
                 StartDate = startDate,
                 EndDate = endDate
             };
 
             ViewModel.Rates.Add(newRate);
-
-            ViewModel.AddedRates.Add(newRate);
         }
 
         private void RemoveRateButtonClick(object sender, RoutedEventArgs e)
@@ -122,21 +108,6 @@ namespace PropertyManagementUi
             var rate = (Rate)((Control)sender).Tag;
 
             ViewModel.Rates.Remove(rate);
-
-            if (ViewModel.AddedRates.Contains(rate))
-            {
-                ViewModel.AddedRates.Remove(rate);
-            }
-            else
-            {
-                if (!ViewModel.DeletedRates.Contains(rate))
-                {
-                    if (ViewModel.ModifiedRates.Contains(rate))
-                        ViewModel.ModifiedRates.Remove(rate);
-
-                    ViewModel.DeletedRates.Add(rate);
-                }
-            }
         }
 
         private void AddAgentButtonClick(object sender, RoutedEventArgs e)
@@ -152,46 +123,18 @@ namespace PropertyManagementUi
                 String.IsNullOrWhiteSpace(ViewModel.NewAgent.Telephone))
                 return;
 
-            _appController.AddAgent(ViewModel.NewAgent);
             ViewModel.Agents.Add(ViewModel.NewAgent);
 
-            //ViewModel.Agent = ViewModel.NewAgent;
-            ViewModel.AgentId = ViewModel.NewAgent.AgentId;
+            ViewModel.Agent = ViewModel.NewAgent;
 
             ViewModel.NewAgent = null;
             AddingAgent = false;
-
-            //_editTenancyDto.AgentId = ViewModel.Agent.AgentId;
         }
 
         private void AddAgentCancelButtonClick(object sender, RoutedEventArgs e)
         {
             ViewModel.NewAgent = null;
             AddingAgent = false;
-        }
-
-        private void TenantDetailsChanged(object sender, TextChangedEventArgs e)
-        {
-            var tenant = (Tenant)((Control)sender).Tag;
-
-            if (tenant.TenantId != 0 && !ViewModel.ModifiedTenants.Contains(tenant))
-                ViewModel.ModifiedTenants.Add(tenant);
-        }
-
-        private void RateDateChanged(object sender, RoutedEventArgs e)
-        {
-            var rate = (Rate)((Control)sender).Tag;
-
-            if (rate.RateId != 0 && !ViewModel.ModifiedRates.Contains(rate))
-                ViewModel.ModifiedRates.Add(rate);
-        }
-
-        private void RateAmountChanged(object sender, TextChangedEventArgs e)
-        {
-            var rate = (Rate)((Control)sender).Tag;
-
-            if (rate.RateId != 0 && !ViewModel.ModifiedRates.Contains(rate))
-                ViewModel.ModifiedRates.Add(rate);
         }
 
         private void OnPropertyChanged([CallerMemberName] string propertyName = "")

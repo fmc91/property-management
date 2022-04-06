@@ -4,6 +4,7 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:PropertyManagementUi"
+      xmlns:scm="clr-namespace:System.ComponentModel;assembly=WindowsBase"
       mc:Ignorable="d" 
       d:DesignHeight="800" d:DesignWidth="1300"
       Title="Tenancy Details">
@@ -26,6 +27,11 @@
                     <ColumnDefinition Width="7*"/>
                 </Grid.ColumnDefinitions>
 
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
                 <Border Grid.Column="0" Style="{StaticResource InfoPanel}" Margin="0 0 4 4">
                     <StackPanel>
                         <TextBlock FontSize="18" Margin="0 0 0 6" Text="Address"/>
@@ -39,7 +45,32 @@
                     </StackPanel>
                 </Border>
 
-                <Border Grid.Column="1" Style="{StaticResource InfoPanel}" Margin="4 0 4 4">
+                <Border Grid.Column="0" Grid.Row="1" Style="{StaticResource InfoPanel}" Margin="0 4 4 4">
+                    <StackPanel>
+                        <TextBlock FontSize="16" Margin="0 0 0 6" Text="Agent"/>
+
+                        <Grid DataContext="{Binding Agent}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="3*"/>
+                                <ColumnDefinition Width="5*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Row="0" Grid.Column="0" Text="Name" FontWeight="SemiBold"/>
+                            <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding Name}"/>
+                            <TextBlock Grid.Row="1" Grid.Column="0" Text="Telephone" FontWeight="SemiBold"/>
+                            <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Telephone}"/>
+                            <TextBlock Grid.Row="2" Grid.Column="0" Text="Email" FontWeight="SemiBold"/>
+                            <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding Email}"/>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <Border Grid.Column="1" Grid.RowSpan="2" Style="{StaticResource InfoPanel}" Margin="4 0 4 4">
                     <StackPanel>
                         <TextBlock FontSize="18" Text="Current Tenants" Margin="0 0 0 6"/>
                         <Grid>
@@ -53,7 +84,7 @@
                             <TextBlock Grid.Column="2" FontWeight="Bold" Text="Email"/>
                         </Grid>
 
-                        <ItemsControl ItemsSource="{Binding CurrentTenants}">
+                        <ItemsControl ItemsSource="{Binding Tenants}">
                             <ItemsControl.ItemsPanel>
                                 <ItemsPanelTemplate>
                                     <StackPanel/>
@@ -78,7 +109,7 @@
                     </StackPanel>
                 </Border>
 
-                <Grid Grid.Column="2">
+                <Grid Grid.Column="2" Grid.RowSpan="2">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="*"/>
@@ -86,6 +117,7 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
 
                     <Border Grid.Column="0" Grid.Row="0"  Style="{StaticResource InfoPanel}" Margin="4 0 4 4">
@@ -116,7 +148,7 @@
                         </StackPanel>
                     </Border>
 
-                        <Border Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2" Style="{StaticResource InfoPanel}" Margin="4 4 0 4">
+                    <Border Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2" Style="{StaticResource InfoPanel}" Margin="4 4 0 4">
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*"/>
@@ -126,14 +158,52 @@
                             <StackPanel Grid.Column="0">
                                 <TextBlock FontWeight="Bold" Text="Outstanding Balance"/>
                                 <TextBlock Margin="0 0 0 4" FontSize="18" Text="{Binding OutstandingBalance, StringFormat='£##,#.00;-£##,#.00;NIL'}"/>
-                                <Button Style="{StaticResource Link}" Content="Add Payment"/>
+                                <Button Style="{StaticResource Link}" Content="Add Payment" Click="AddPaymentLinkClick"
+                                    Visibility="{Binding Path=AddingPayment, Converter={StaticResource VisibleIfFalse}, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Page}}"/>
                             </StackPanel>
 
                             <StackPanel Grid.Column="1">
                                 <TextBlock FontWeight="Bold" Text="Next Payment Due"/>
-                                <TextBlock FontSize="18" Text="{Binding NextPaymentDue, StringFormat='dd MMMM', TargetNullValue='N/A'}"/>
+                                <TextBlock FontSize="18" Text="{Binding NextPaymentDate, StringFormat='dd MMMM', TargetNullValue='N/A'}"/>
                             </StackPanel>
                         </Grid>
+                    </Border>
+
+                    <Border Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="2" Style="{StaticResource InfoPanel}"
+                        Visibility="{Binding Path=AddingPayment, Converter={StaticResource VisibleIfTrue}, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Page}}"
+                            Margin="4 4 0 4">
+
+                        <Grid DataContext="{Binding NewPayment}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="180"/>
+                            </Grid.ColumnDefinitions>
+
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Row="0" Grid.Column="0" Text="Date" FontWeight="SemiBold" Margin="0 0 0 2"/>
+                            <DatePicker Grid.Row="1" Grid.Column="0" Margin="0 0 12 4" SelectedDate="{Binding Date, Mode=TwoWay}"/>
+
+                            <TextBlock Grid.Row="0" Grid.Column="1" Text="Amount" FontWeight="SemiBold" Margin="0 0 0 2"/>
+                            <TextBox Grid.Row="1" Grid.Column="1" Margin="0 0 0 4" Text="{Binding Amount, Mode=TwoWay}"/>
+
+                            <TextBlock Grid.Row="2" Grid.Column="0" Text="Description" FontWeight="SemiBold" Margin="0 0 0 2"/>
+                            <TextBox Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Margin="0 0 0 4" Text="{Binding Description, Mode=TwoWay}"/>
+
+                            <StackPanel Orientation="Horizontal" Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2">
+                                <Button Content="Confirm" Click="ConfirmAddPaymentButtonClick" Padding="18 6" Margin="0 0 8 0" HorizontalAlignment="Left"/>
+                                <Button Content="Cancel" Click="CancelAddPaymentButtonClick" Padding="18 6" HorizontalAlignment="Left"/>
+                            </StackPanel>
+
+                        </Grid>
+                        
                     </Border>
                 </Grid>
                 
@@ -169,7 +239,16 @@
                         </Grid>
 
                         <ScrollViewer Grid.Row="2" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
-                            <ItemsControl ItemsSource="{Binding AccountEntries}">
+
+                            <ScrollViewer.Resources>
+                                <CollectionViewSource x:Key="AccountEntriesViewSource" Source="{Binding AccountEntries}">
+                                    <CollectionViewSource.SortDescriptions>
+                                        <scm:SortDescription PropertyName="Date" Direction="Ascending"/>
+                                    </CollectionViewSource.SortDescriptions>
+                                </CollectionViewSource>
+                            </ScrollViewer.Resources>
+                            
+                            <ItemsControl ItemsSource="{Binding Source={StaticResource AccountEntriesViewSource}}">
                                 <ItemsControl.ItemsPanel>
                                     <ItemsPanelTemplate>
                                         <StackPanel/>
@@ -186,7 +265,7 @@
                                             </Grid.ColumnDefinitions>
 
                                             <TextBlock Grid.Column="0" Text="{Binding Date, StringFormat='dd MMM yyyy'}"/>
-                                            <TextBlock Grid.Column="1" Text="{Binding Narration}"/>
+                                            <TextBlock Grid.Column="1" Text="{Binding Description}"/>
                                             <TextBlock Grid.Column="2" Text="{Binding Amount, StringFormat='£##,#.00'}"/>
                                         </Grid>
                                     </DataTemplate>

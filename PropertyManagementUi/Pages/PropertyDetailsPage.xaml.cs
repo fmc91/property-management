@@ -1,6 +1,4 @@
-﻿using PropertyManagementCommon;
-using PropertyManagementCommon.Model;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -8,6 +6,8 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
+using PropertyManagementService.Model;
+using PropertyManagementUi.ViewModels;
 
 namespace PropertyManagementUi
 {
@@ -37,14 +37,6 @@ namespace PropertyManagementUi
         private bool _editingExpenses;
 
         private bool _editingImprovements;
-
-        private List<Expense> _editedExpenses;
-
-        private List<Improvement> _editedImprovements;
-
-        private List<Expense> _deletedExpenses;
-
-        private List<Improvement> _deletedImprovements;
 
         private Dictionary<string, List<string>> _propertyDependencies = new Dictionary<string, List<string>>
         {
@@ -221,9 +213,9 @@ namespace PropertyManagementUi
             }
         }
 
-        public bool ShowNoInsuranceText => ViewModel == null ? false : ViewModel.Insurance == null && !AddingInsurance;
+        public bool ShowNoInsuranceText => ViewModel == null ? false : ViewModel.InsurancePolicy == null && !AddingInsurance;
 
-        public bool ShowInsuranceDetails => ViewModel == null ? false : ViewModel.Insurance != null && !AddingInsurance;
+        public bool ShowInsuranceDetails => ViewModel == null ? false : ViewModel.InsurancePolicy != null && !AddingInsurance;
 
         public bool ShowNoElectricalCertificateText => ViewModel == null ? false : ViewModel.ElectricalInspectionCertificate == null && !AddingElectricalCertificate;
 
@@ -256,6 +248,11 @@ namespace PropertyManagementUi
             }
         }
 
+        private void EditButtonClick(object sender, RoutedEventArgs e)
+        {
+            _appController.EditPropertyPage(ViewModel.PropertyId);
+        }
+
         private void BackLinkClick(object sender, RoutedEventArgs e)
         {
             _appController.IndexPage();
@@ -263,7 +260,7 @@ namespace PropertyManagementUi
 
         private void TenancyDetailsButtonClick(object sender, RoutedEventArgs e)
         {
-            _appController.TenancyDetailsPage(ViewModel.CurrentTenancy.TenancyId);
+            _appController.TenancyDetailsPage(ViewModel.Tenancy.TenancyId);
         }
 
         private void AddTenancyButtonClick(object sender, RoutedEventArgs e)
@@ -271,23 +268,20 @@ namespace PropertyManagementUi
             _appController.AddTenancyPage(ViewModel.PropertyId);
         }
 
-        private void AddInsuranceButtonClick(object sender, RoutedEventArgs e)
+        private void AddInsurancePolicyButtonClick(object sender, RoutedEventArgs e)
         {
-            ViewModel.NewInsurance = new NewInsuranceViewModel
-            {
-                PropertyId = ViewModel.PropertyId,
-                StartDate = DateTime.Today,
-                EndDate = DateTime.Today,
-                Insurers = _appController.GetAllInsurers().ToList(),
-                Brokers = _appController.GetAllBrokers().ToList()
-            };
+            var newInsurancePolicy = _appController.GetNewInsurancePolicyViewModel(ViewModel.PropertyId);
+            newInsurancePolicy.StartDate = DateTime.Today;
+            newInsurancePolicy.EndDate = DateTime.Today;
+
+            ViewModel.NewInsurancePolicy = newInsurancePolicy;
 
             AddingInsurance = true;
         }
 
-        private void AddInsuranceOkButtonClick(object sender, RoutedEventArgs e)
+        private void AddInsurancePolicyOkButtonClick(object sender, RoutedEventArgs e)
         {
-            var newInsurance = ViewModel.NewInsurance;
+            var newInsurance = ViewModel.NewInsurancePolicy;
 
             //NEED TO CHANGE VALIDATION
             if (newInsurance.Broker == null ||
@@ -295,25 +289,25 @@ namespace PropertyManagementUi
                 newInsurance.EndDate < newInsurance.StartDate)
                 return;
 
-            _appController.AddInsurance(newInsurance);
+            _appController.AddInsurancePolicy(newInsurance);
 
-            ViewModel.Insurance = _appController.GetLatestInsurance(ViewModel.PropertyId);
+            ViewModel.InsurancePolicy = _appController.GetLatestInsurancePolicy(ViewModel.PropertyId);
 
-            ViewModel.NewInsurance = null;
+            ViewModel.NewInsurancePolicy = null;
 
             AddingInsurance = false;
         }
 
-        private void AddInsuranceCancelButtonClick(object sender, RoutedEventArgs e)
+        private void AddInsurancePolicyCancelButtonClick(object sender, RoutedEventArgs e)
         {
-            ViewModel.NewInsurance = null;
+            ViewModel.NewInsurancePolicy = null;
 
             AddingInsurance = false;
         }
 
         private void AddInsurerButtonClick(object sender, RoutedEventArgs e)
         {
-            var newInsurance = ViewModel.NewInsurance;
+            var newInsurance = ViewModel.NewInsurancePolicy;
 
             newInsurance.NewInsurer = new Insurer();
 
@@ -322,7 +316,7 @@ namespace PropertyManagementUi
 
         private void AddInsurerOkButtonClick(object sender, RoutedEventArgs e)
         {
-            var newInsurance = ViewModel.NewInsurance;
+            var newInsurance = ViewModel.NewInsurancePolicy;
             var newInsurer = newInsurance.NewInsurer;
 
             //NEED TO CHANGE VALIDATION
@@ -330,7 +324,6 @@ namespace PropertyManagementUi
                 String.IsNullOrWhiteSpace(newInsurer.Telephone))
                 return;
 
-            _appController.AddInsurer(newInsurer);
             newInsurance.Insurers.Add(newInsurer);
 
             newInsurance.Insurer = newInsurer;
@@ -342,13 +335,13 @@ namespace PropertyManagementUi
 
         private void AddInsurerCancelButtonClick(object sender, RoutedEventArgs e)
         {
-            ViewModel.NewInsurance.NewInsurer = null;
+            ViewModel.NewInsurancePolicy.NewInsurer = null;
             AddingInsurer = false;
         }
 
         private void AddBrokerButtonClick(object sender, RoutedEventArgs e)
         {
-            var newInsurance = ViewModel.NewInsurance;
+            var newInsurance = ViewModel.NewInsurancePolicy;
 
             newInsurance.NewBroker = new Broker();
 
@@ -357,7 +350,7 @@ namespace PropertyManagementUi
 
         private void AddBrokerOkButtonClick(object sender, RoutedEventArgs e)
         {
-            var newInsurance = ViewModel.NewInsurance;
+            var newInsurance = ViewModel.NewInsurancePolicy;
             var newBroker = newInsurance.NewBroker;
 
             //NEED TO CHANGE VALIDATION
@@ -365,7 +358,6 @@ namespace PropertyManagementUi
                 String.IsNullOrWhiteSpace(newBroker.Telephone))
                 return;
 
-            _appController.AddBroker(newBroker);
             newInsurance.Brokers.Add(newBroker);
 
             newInsurance.Broker = newBroker;
@@ -377,7 +369,7 @@ namespace PropertyManagementUi
 
         private void AddBrokerCancelButtonClick(object sender, RoutedEventArgs e)
         {
-            ViewModel.NewInsurance.NewBroker = null;
+            ViewModel.NewInsurancePolicy.NewBroker = null;
             AddingBroker = false;
         }
 
@@ -385,7 +377,6 @@ namespace PropertyManagementUi
         {
             ViewModel.NewElectricalInspectionCertificate = new ElectricalInspectionCertificate
             {
-                PropertyId = ViewModel.PropertyId,
                 IssueDate = DateTime.Today,
                 ExpiryDate = DateTime.Today
             };
@@ -400,7 +391,7 @@ namespace PropertyManagementUi
             //NEED TO CHANGE VALIDATION
             if (newCertificate.ExpiryDate < newCertificate.IssueDate) return;
 
-            _appController.AddElectricalInspectionCertificate(newCertificate);
+            _appController.AddElectricalInspectionCertificate(ViewModel.PropertyId, newCertificate);
 
             ViewModel.ElectricalInspectionCertificate = _appController.GetLatestElectricalInspectionCertificate(ViewModel.PropertyId);
 
@@ -418,7 +409,6 @@ namespace PropertyManagementUi
         {
             ViewModel.NewGasSafetyCertificate = new GasSafetyCertificate
             {
-                PropertyId = ViewModel.PropertyId,
                 IssueDate = DateTime.Today,
                 ExpiryDate = DateTime.Today
             };
@@ -433,7 +423,7 @@ namespace PropertyManagementUi
             //NEED TO CHANGE VALIDATION
             if (newCertificate.ExpiryDate < newCertificate.IssueDate) return;
 
-            _appController.AddGasSafetyCertificate(newCertificate);
+            _appController.AddGasSafetyCertificate(ViewModel.PropertyId, newCertificate);
 
             ViewModel.GasSafetyCertificate = _appController.GetLatestGasSafetyCertificate(ViewModel.PropertyId);
 
@@ -451,7 +441,6 @@ namespace PropertyManagementUi
         {
             ViewModel.NewEnergyPerformanceCertificate = new EnergyPerformanceCertificate
             {
-                PropertyId = ViewModel.PropertyId,
                 IssueDate = DateTime.Today,
                 ExpiryDate = DateTime.Today
             };
@@ -466,7 +455,7 @@ namespace PropertyManagementUi
             //NEED TO CHANGE VALIDATION
             if (newCertificate.ExpiryDate < newCertificate.IssueDate) return;
 
-            _appController.AddEnergyPerformanceCertificate(newCertificate);
+            _appController.AddEnergyPerformanceCertificate(ViewModel.PropertyId, newCertificate);
 
             ViewModel.EnergyPerformanceCertificate = _appController.GetLatestEnergyPerformanceCertificate(ViewModel.PropertyId);
 
@@ -482,13 +471,15 @@ namespace PropertyManagementUi
 
         private void AddExpenseButtonClick(object sender, RoutedEventArgs e)
         {
-            ViewModel.NewExpense = new Expense { PropertyId = ViewModel.PropertyId, Date = DateTime.Today };
+            ViewModel.NewExpense = new Expense { Date = DateTime.Today };
             AddingExpense = true;
         }
 
         private void AddExpenseOkButtonClick(object sender, RoutedEventArgs e)
         {
-            _appController.AddExpense(ViewModel.NewExpense);
+            if (String.IsNullOrEmpty(ViewModel.NewExpense.Description)) return;
+
+            _appController.AddExpense(ViewModel.PropertyId, ViewModel.NewExpense);
             ViewModel.Expenses.Add(ViewModel.NewExpense);
 
             ViewModel.NewExpense = null;
@@ -503,13 +494,15 @@ namespace PropertyManagementUi
 
         private void AddImprovementButtonClick(object sender, RoutedEventArgs e)
         {
-            ViewModel.NewImprovement = new Improvement { PropertyId = ViewModel.PropertyId, Date = DateTime.Today };
+            ViewModel.NewImprovement = new Improvement { Date = DateTime.Today };
             AddingImprovement = true;
         }
 
         private void AddImprovementOkButtonClick(object sender, RoutedEventArgs e)
         {
-            _appController.AddImprovement(ViewModel.NewImprovement);
+            if (String.IsNullOrWhiteSpace(ViewModel.NewImprovement.Description)) return;
+
+            _appController.AddImprovement(ViewModel.PropertyId, ViewModel.NewImprovement);
             ViewModel.Improvements.Add(ViewModel.NewImprovement);
 
             ViewModel.NewImprovement = null;
@@ -524,92 +517,64 @@ namespace PropertyManagementUi
 
         private void EditImprovementsButtonClick(object sender, RoutedEventArgs e)
         {
-            ViewModel.ImprovementsForEdit = new ObservableCollection<Improvement>(
-                ViewModel.Improvements.Select(i => new Improvement
-                {
-                    ImprovementId = i.ImprovementId,
-                    PropertyId = i.PropertyId,
-                    Date = i.Date,
-                    Description = i.Description,
-                    Cost = i.Cost
-                }));
-
-            _editedImprovements = new List<Improvement>();
-            _deletedImprovements = new List<Improvement>();
+            ViewModel.ImprovementsForEdit = new ObservableCollection<Improvement>(ViewModel.Improvements.Select(i => new Improvement
+            {
+                ImprovementId = i.ImprovementId,
+                Date = i.Date,
+                Description = i.Description,
+                Cost = i.Cost
+            }));
 
             EditingImprovements = true;
         }
 
         private void EditExpensesButtonClick(object sender, RoutedEventArgs e)
         {
-            ViewModel.ExpensesForEdit = new ObservableCollection<Expense>(
-                ViewModel.Expenses.Select(i => new Expense
-                {
-                    ExpenseId  = i.ExpenseId,
-                    PropertyId = i.PropertyId,
-                    Date = i.Date,
-                    Description = i.Description,
-                    Amount = i.Amount
-                }));
-
-            _editedExpenses = new List<Expense>();
-            _deletedExpenses = new List<Expense>();
+            ViewModel.ExpensesForEdit = new ObservableCollection<Expense>(ViewModel.Expenses.Select(i => new Expense
+            {
+                ExpenseId  = i.ExpenseId,
+                Date = i.Date,
+                Description = i.Description,
+                Amount = i.Amount
+            }));
 
             EditingExpenses = true;
         }
 
         private void EditImprovementsOkButtonClick(object sender, RoutedEventArgs e)
         {
-            _editedImprovements.RemoveAll(x => _deletedImprovements.Contains(x));
-
-            if (_editedImprovements.Count != 0)
-                _appController.EditImprovements(_editedImprovements);
-
-            if (_deletedImprovements.Count != 0)
-                _appController.DeleteImprovements(_deletedImprovements);
+            if (ViewModel.ImprovementsForEdit.Any(i => String.IsNullOrWhiteSpace(i.Description))) return;
 
             ViewModel.Improvements = ViewModel.ImprovementsForEdit;
-            EditingImprovements = false;
             ViewModel.ImprovementsForEdit = null;
 
-            _editedImprovements = null;
-            _deletedImprovements = null;
+            _appController.UpdateImprovements(ViewModel.PropertyId, ViewModel.Improvements);
+
+            EditingImprovements = false;
         }
 
         private void EditImprovementsCancelButtonClick(object sender, RoutedEventArgs e)
         {
             EditingImprovements = false;
             ViewModel.ImprovementsForEdit = null;
-
-            _editedImprovements = null;
-            _deletedImprovements = null;
         }
 
         private void EditExpensesOkButtonClick(object sender, RoutedEventArgs e)
         {
-            _editedExpenses.RemoveAll(x => _deletedExpenses.Contains(x));
-
-            if (_editedExpenses.Count != 0)
-                _appController.EditExpenses(_editedExpenses);
-
-            if (_deletedExpenses.Count != 0)
-                _appController.DeleteExpenses(_deletedExpenses);
+            if (ViewModel.ExpensesForEdit.Any(e => String.IsNullOrWhiteSpace(e.Description))) return;
 
             ViewModel.Expenses = ViewModel.ExpensesForEdit;
-            EditingExpenses = false;
             ViewModel.ExpensesForEdit = null;
 
-            _editedExpenses = null;
-            _deletedExpenses = null;
+            _appController.UpdateExpenses(ViewModel.PropertyId, ViewModel.Expenses);
+
+            EditingExpenses = false;
         }
 
         private void EditExpensesCancelButtonClick(object sender, RoutedEventArgs e)
         {
             EditingExpenses = false;
             ViewModel.ExpensesForEdit = null;
-
-            _editedExpenses = null;
-            _deletedExpenses = null;
         }
 
         private void DeleteExpenseButtonClick(object sender, RoutedEventArgs e)
@@ -617,9 +582,6 @@ namespace PropertyManagementUi
             var expense = (Expense)((Control)sender).Tag;
 
             ViewModel.ExpensesForEdit.Remove(expense);
-            _editedExpenses.Remove(expense);
-
-            _deletedExpenses.Add(expense);
         }
 
         private void DeleteImprovementButtonClick(object sender, RoutedEventArgs e)
@@ -627,45 +589,6 @@ namespace PropertyManagementUi
             var improvement = (Improvement)((Control)sender).Tag;
 
             ViewModel.ImprovementsForEdit.Remove(improvement);
-            _editedImprovements.Remove(improvement);
-
-            _deletedImprovements.Add(improvement);
-        }
-
-        private void ImprovementDateChanged(object sender, SelectionChangedEventArgs e)
-        {
-            var improvement = (Improvement)((Control)sender).Tag;
-            _editedImprovements.Add(improvement);
-        }
-
-        private void ImprovementDescriptionChanged(object sender, TextChangedEventArgs e)
-        {
-            var improvement = (Improvement)((Control)sender).Tag;
-            _editedImprovements.Add(improvement);
-        }
-
-        private void ImprovementCostChanged(object sender, TextChangedEventArgs e)
-        {
-            var improvement = (Improvement)((Control)sender).Tag;
-            _editedImprovements.Add(improvement);
-        }
-
-        private void ExpenseDateChanged(object sender, SelectionChangedEventArgs e)
-        {
-            var expense = (Expense)((Control)sender).Tag;
-            _editedExpenses.Add(expense);
-        }
-
-        private void ExpenseDescriptionChanged(object sender, TextChangedEventArgs e)
-        {
-            var expense = (Expense)((Control)sender).Tag;
-            _editedExpenses.Add(expense);
-        }
-
-        private void ExpenseAmountChanged(object sender, TextChangedEventArgs e)
-        {
-            var expense = (Expense)((Control)sender).Tag;
-            _editedExpenses.Add(expense);
         }
     }
 }

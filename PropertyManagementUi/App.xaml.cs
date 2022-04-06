@@ -1,5 +1,4 @@
-﻿using PropertyManagementService;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Configuration;
@@ -8,6 +7,12 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Navigation;
+using AutoMapper;
+using PropertyManagementBootstrap;
+using PropertyManagementService;
+using PropertyManagementService.Model;
+using PropertyManagementUi.Profiles;
+using PropertyManagementUi.ViewModels;
 
 namespace PropertyManagementUi
 {
@@ -16,8 +21,6 @@ namespace PropertyManagementUi
     /// </summary>
     public partial class App : Application
     {
-        private AppController _appController;
-
         private void ApplicationStartup(object sender, StartupEventArgs e)
         {
             NavigationWindow window = new NavigationWindow
@@ -33,11 +36,29 @@ namespace PropertyManagementUi
 
             window.Show();
 
-            var propertyServiceCreator = new PropertyServiceCreator();
+            var serviceProvider = AppBootstrap.GetServiceProvider();
+            var mapperConfig = CreateMapperConfig();
 
-            _appController = new AppController(window, propertyServiceCreator.Create());
+            var appController = new AppController(window, serviceProvider, new RateAssistant(), new Mapper(mapperConfig));
 
-            _appController.IndexPage();
+            appController.IndexPage();
+        }
+
+        private MapperConfiguration CreateMapperConfig()
+        {
+            return new MapperConfiguration(cfg =>
+            {
+                cfg.AddProfile<NewInsurancePolicyProfile>();
+                cfg.AddProfile<AddPropertyProfile>();
+                cfg.AddProfile<EditPropertyProfile>();
+                cfg.AddProfile<AddTenancyProfile>();
+                cfg.AddProfile<EditTenancyProfile>();
+                cfg.AddProfile<PropertyDetailsProfile>();
+                cfg.AddProfile<PropertySummaryProfile>();
+                cfg.AddProfile<TenancyDetailsProfile>();
+
+                cfg.CreateMap<Tenancy, TenancySummaryViewModel>();
+            });
         }
     }
 }
