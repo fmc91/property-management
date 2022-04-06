@@ -1,0 +1,46 @@
+{
+  "Version": 1,
+  "ProjectMap": {
+    "2a076860-f842-48a6-9ff7-666f02d62884": {
+      "ProjectGuid": "2a076860-f842-48a6-9ff7-666f02d62884",
+      "DisplayName": "PropertyManagementService",
+      "ColorIndex": 0
+    },
+    "20165406-7f93-41d6-ba52-b5d16ff3eb35": {
+      "ProjectGuid": "20165406-7f93-41d6-ba52-b5d16ff3eb35",
+      "DisplayName": "PropertyManagementBootstrap",
+      "ColorIndex": 1
+    },
+    "914c7094-786e-417d-b806-7887c70274d5": {
+      "ProjectGuid": "914c7094-786e-417d-b806-7887c70274d5",
+      "DisplayName": "PropertyManagementUi",
+      "ColorIndex": 2
+    },
+    "5b0e5065-8d89-4776-ace8-227bccc2b925": {
+      "ProjectGuid": "5b0e5065-8d89-4776-ace8-227bccc2b925",
+      "DisplayName": "PropertyManagementData",
+      "ColorIndex": 3
+    },
+    "dec333ea-1a63-4ae7-b462-2fc3d4fa909e": {
+      "ProjectGuid": "dec333ea-1a63-4ae7-b462-2fc3d4fa909e",
+      "DisplayName": "PropertyManagementApp",
+      "ColorIndex": 4
+    },
+    "2f19f0c4-507a-455a-b692-c351ff3ce4d8": {
+      "ProjectGuid": "2f19f0c4-507a-455a-b692-c351ff3ce4d8",
+      "DisplayName": "AccountUpdateSystem",
+      "ColorIndex": 5
+    },
+    "a2fe74e1-b743-11d0-ae1a-00a0c90fffc3": {
+      "ProjectGuid": "a2fe74e1-b743-11d0-ae1a-00a0c90fffc3",
+      "DisplayName": "Miscellaneous Files",
+      "ColorIndex": -1
+    },
+    "6bb2aa79-e64a-4a31-9030-37fecdebb534": {
+      "ProjectGuid": "6bb2aa79-e64a-4a31-9030-37fecdebb534",
+      "DisplayName": "PropertyManagementCommon",
+      "ColorIndex": 6
+    }
+  },
+  "NextColorIndex": 7
+}

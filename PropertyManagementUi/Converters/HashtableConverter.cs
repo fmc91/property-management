@@ -13,8 +13,6 @@ namespace PropertyManagementUi
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (ConversionTable == null) return null;
-
             return ConversionTable == null ? null : ConversionTable.ContainsKey(value) ? ConversionTable[value] : null;
         }
 

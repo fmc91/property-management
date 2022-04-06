@@ -4,6 +4,7 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:PropertyManagementUi"
+      xmlns:sys="clr-namespace:System;assembly=mscorlib"
       mc:Ignorable="d" 
       d:DesignHeight="800" d:DesignWidth="1300"
       Title="Property Details Page">
@@ -79,7 +80,8 @@
         <StackPanel MinWidth="1200" MaxWidth="1300" Margin="12">
             <DockPanel Margin="0 0 0 12">
                 <local:RoundedButton DockPanel.Dock="Right" Background="#3070FF" PressedBackground="#4890FF" Foreground="White" CornerRadius="6"
-                                     HighlightStroke="{StaticResource BtnMouseOverHighlight}" HighlightStrokeThickness="2" Content="Edit" FontSize="16" Width="120"/>
+                                     HighlightStroke="{StaticResource BtnMouseOverHighlight}" HighlightStrokeThickness="2" Content="Edit" FontSize="16" Width="120"
+                                     Click="EditButtonClick"/>
                 <TextBlock Text="Property Details" Style="{StaticResource PageHeading}" Margin="0 0 16 0"/>
                 <Button Style="{StaticResource Link}" Click="BackLinkClick" Content="Back" FontSize="14" VerticalAlignment="Center"/>
             </DockPanel>
@@ -93,7 +95,7 @@
                 </Grid.ColumnDefinitions>
 
                 <Border Grid.Column="0" Style="{StaticResource InfoPanel}" Margin="0 0 4 4">
-                    <Image Source="{StaticResource HouseImg}"/>
+                    <Image Source="{Binding ImagePath, Converter={StaticResource TemplateImageConverter}, TargetNullValue={StaticResource HouseImg}}"/>
                 </Border>
 
                 <Grid Grid.Column="1">
@@ -106,11 +108,11 @@
 
                         <StackPanel>
                             <DockPanel Margin="0 0 0 6">
-                                <TextBlock DockPanel.Dock="Right" FontSize="14" Text="Residential"/>
+                                <TextBlock DockPanel.Dock="Right" FontSize="14" Text="{Binding PropertyKind, Converter={StaticResource PropertyKindConverter}}"/>
                                 <TextBlock VerticalAlignment="Center" FontWeight="Bold" Text="Property Type"/>
                             </DockPanel>
                             <DockPanel>
-                                <TextBlock DockPanel.Dock="Right" FontSize="14" Text="{Binding Owner}"/>
+                                <TextBlock DockPanel.Dock="Right" FontSize="14" Text="{Binding Owner.Name}"/>
                                 <TextBlock VerticalAlignment="Center" FontWeight="Bold" Text="Owner"/>
                             </DockPanel>
                         </StackPanel>
@@ -145,11 +147,11 @@
                                                 Width="28" Height="28" Padding="6" HighlightStrokeThickness="1" ToolTip="Add Tenancy"/>
                                 <local:CircularButton DockPanel.Dock="Right" Click="TenancyDetailsButtonClick" Style="{StaticResource ViewDetailButton}"
                                                       Height="24" Width="24" Padding="5" HighlightStrokeThickness="1" Margin="0 0 4 0" VerticalAlignment="Center" ToolTip="View Details"
-                                                      Visibility="{Binding CurrentTenancy, Converter={StaticResource VisibleIfNotNull}}"/>
+                                                      Visibility="{Binding Tenancy, Converter={StaticResource VisibleIfNotNull}}"/>
                                 <TextBlock FontSize="18" Text="Current Tenants" Margin="0 0 0 6"/>
                             </DockPanel>
 
-                            <Grid Visibility="{Binding CurrentTenancy, Converter={StaticResource VisibleIfNotNull}}">
+                            <Grid Visibility="{Binding Tenancy, Converter={StaticResource VisibleIfNotNull}}">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="5*"/>
                                     <ColumnDefinition Width="3*"/>
@@ -158,7 +160,7 @@
                                 <TextBlock Grid.Column="1" FontWeight="Bold" Text="Telephone"/>
                             </Grid>
 
-                            <ItemsControl ItemsSource="{Binding CurrentTenancy.Tenants}" Visibility="{Binding CurrentTenancy, Converter={StaticResource VisibleIfNotNull}}">
+                            <ItemsControl ItemsSource="{Binding Tenancy.Tenants}" Visibility="{Binding Tenancy, Converter={StaticResource VisibleIfNotNull}}">
                                 <ItemsControl.ItemsPanel>
                                     <ItemsPanelTemplate>
                                         <StackPanel/>
@@ -184,12 +186,12 @@
                     <Border Grid.Row="1" Style="{StaticResource InfoPanel}" Margin="4">
                         <StackPanel>
                             <DockPanel Margin="0 0 0 4">
-                                <TextBlock DockPanel.Dock="Right" FontSize="16" Text="{Binding CurrentTenancy.StartDate, StringFormat='dd MMMM yyyy', FallbackValue='N/A'}"/>
+                                <TextBlock DockPanel.Dock="Right" FontSize="16" Text="{Binding Tenancy.StartDate, StringFormat='dd MMMM yyyy', FallbackValue='N/A'}"/>
                                 <TextBlock FontWeight="Bold" VerticalAlignment="Center" Text="Tenancy Start"/>
                             </DockPanel>
 
                             <DockPanel>
-                                <TextBlock DockPanel.Dock="Right" FontSize="16" Text="{Binding CurrentTenancy.EndDate, StringFormat='dd MMMM yyyy', FallbackValue='N/A'}"/>
+                                <TextBlock DockPanel.Dock="Right" FontSize="16" Text="{Binding Tenancy.EndDate, StringFormat='dd MMMM yyyy', FallbackValue='N/A'}"/>
                                 <TextBlock FontWeight="Bold" VerticalAlignment="Center" Text="Tenancy End"/>
                             </DockPanel>
                         </StackPanel>
@@ -204,14 +206,12 @@
 
                             <StackPanel Grid.Column="0">
                                 <TextBlock FontWeight="Bold" Text="Outstanding Balance"/>
-                                <TextBlock Margin="0 0 0 4" FontSize="18" Text="{Binding CurrentTenancy.OutstandingBalance, StringFormat='£##,#.00;-£##,#.00;NIL', FallbackValue='N/A'}"/>
-                                <Button Style="{StaticResource Link}" Content="View Account" Margin="0 0 0 2"/>
-                                <Button Style="{StaticResource Link}" Content="Add Payment"/>
+                                <TextBlock Margin="0 0 0 4" FontSize="18" Text="{Binding Tenancy.OutstandingBalance, StringFormat='£##,#.00;-£##,#.00;NIL', FallbackValue='N/A'}"/>
                             </StackPanel>
 
                             <StackPanel Grid.Column="1">
                                 <TextBlock FontWeight="Bold" Text="Next Payment Due"/>
-                                <TextBlock FontSize="18" Text="{Binding CurrentTenancy.NextPaymentDue, StringFormat='dd MMMM', FallbackValue='N/A', TargetNullValue='N/A'}"/>
+                                <TextBlock FontSize="18" Text="{Binding Tenancy.NextPaymentDate, StringFormat='dd MMMM', FallbackValue='N/A', TargetNullValue='N/A'}"/>
                             </StackPanel>
                         </Grid>
                     </Border>
@@ -274,7 +274,7 @@
                                                 <ColumnDefinition Width="3*"/>
                                             </Grid.ColumnDefinitions>
 
-                                            <TextBlock Grid.Column="0" Text="{Binding Type, Converter={StaticResource PurchaseCostTypeConverter}}"/>
+                                            <TextBlock Grid.Column="0" Text="{Binding Kind, Converter={StaticResource PurchaseCostKindConverter}}"/>
                                             <TextBlock Grid.Column="1" Text="{Binding Amount, StringFormat='£##,#.00'}"/>
 
                                         </Grid>
@@ -299,7 +299,7 @@
                     <StackPanel>
 
                         <DockPanel Margin="0 0 0 4" Visibility="{Binding AddingInsurance, RelativeSource={RelativeSource AncestorType=Page}, Converter={StaticResource VisibleIfFalse}}">
-                            <local:CircularButton DockPanel.Dock="Right" Click="AddInsuranceButtonClick" Style="{StaticResource AddButton}"
+                            <local:CircularButton DockPanel.Dock="Right" Click="AddInsurancePolicyButtonClick" Style="{StaticResource AddButton}"
                                                 Width="28" Height="28" HighlightStrokeThickness="1" Padding="6" ToolTip="Add Insurance"/>
                             <TextBlock VerticalAlignment="Center" FontSize="18" Text="Insurance"/>
                         </DockPanel>
@@ -307,7 +307,7 @@
                         <TextBlock Margin="0 4 0 0" FontSize="18" FontWeight="Bold" Foreground="Red" Text="NO INSURANCE" HorizontalAlignment="Center"
                                     Visibility="{Binding ShowNoInsuranceText, RelativeSource={RelativeSource AncestorType=Page}, Converter={StaticResource VisibleIfTrue}}"/>
 
-                        <StackPanel DataContext="{Binding Insurance}"
+                        <StackPanel DataContext="{Binding InsurancePolicy}"
                                     Visibility="{Binding ShowInsuranceDetails, RelativeSource={RelativeSource AncestorType=Page}, Converter={StaticResource VisibleIfTrue}}">
                             <DockPanel Margin="0 0 0 4">
                                 <TextBlock DockPanel.Dock="Right" FontSize="16" Text="{Binding StartDate, StringFormat='dd MMMM yyyy'}"/>
@@ -348,11 +348,11 @@
                             </DockPanel>
                         </StackPanel>
 
-                        <StackPanel DataContext="{Binding NewInsurance, Mode=TwoWay}" Visibility="{Binding AddingInsurance, RelativeSource={RelativeSource AncestorType=Page}, Converter={StaticResource VisibleIfTrue}}">
+                        <StackPanel DataContext="{Binding NewInsurancePolicy, Mode=TwoWay}" Visibility="{Binding AddingInsurance, RelativeSource={RelativeSource AncestorType=Page}, Converter={StaticResource VisibleIfTrue}}">
                             <DockPanel Margin="0 0 0 6">
-                                <local:CircularButton DockPanel.Dock="Right" Click="AddInsuranceCancelButtonClick" Style="{StaticResource RemoveButton}" Width="20" Height="20" HighlightStrokeThickness="1"
+                                <local:CircularButton DockPanel.Dock="Right" Click="AddInsurancePolicyCancelButtonClick" Style="{StaticResource RemoveButton}" Width="20" Height="20" HighlightStrokeThickness="1"
                                         Padding="4" ToolTip="Cancel"/>
-                                <local:CircularButton DockPanel.Dock="Right" Click="AddInsuranceOkButtonClick" Style="{StaticResource OkButton}" Width="20" Height="20" HighlightStrokeThickness="1"
+                                <local:CircularButton DockPanel.Dock="Right" Click="AddInsurancePolicyOkButtonClick" Style="{StaticResource OkButton}" Width="20" Height="20" HighlightStrokeThickness="1"
                                         Padding="4" Margin="0 0 4 0" ToolTip="OK"/>
                                 <TextBlock FontSize="18" Text="Insurance"/>
                             </DockPanel>
@@ -648,16 +648,17 @@
 
                                 <ScrollViewer Grid.Row="2" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
                                     <StackPanel>
-                                        <Grid Margin="0 0 0 2" Visibility="{Binding AddingExpense, RelativeSource={RelativeSource AncestorType=Page}, Converter={StaticResource VisibleIfTrue}}">
+                                        <Grid Margin="0 0 0 2" Visibility="{Binding AddingExpense, RelativeSource={RelativeSource AncestorType=Page}, Converter={StaticResource VisibleIfTrue}}"
+                                              DataContext="{Binding NewExpense}">
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition Width="3*"/>
                                                 <ColumnDefinition Width="10*"/>
                                                 <ColumnDefinition Width="3*"/>
                                             </Grid.ColumnDefinitions>
 
-                                            <DatePicker Grid.Column="0" Margin="0 0 4 0" SelectedDate="{Binding NewExpense.Date, Mode=TwoWay}"/>
-                                            <TextBox Grid.Column="1" Margin="0 0 4 0" Text="{Binding NewExpense.Description, Mode=TwoWay}"/>
-                                            <TextBox Grid.Column="2" Text="{Binding NewExpense.Amount, Mode=TwoWay}"/>
+                                            <DatePicker Grid.Column="0" Name="newExpenseDatePicker" Margin="0 0 4 0" SelectedDate="{Binding Date, Mode=TwoWay}"/>
+                                            <TextBox Grid.Column="1" Name="newExpenseDescriptionTextBox" Margin="0 0 4 0" Text="{Binding Description, Mode=TwoWay}"/>
+                                            <TextBox Grid.Column="2" Name="newExpenseAmountTextBox" Text="{Binding Amount, Mode=TwoWay}"/>
                                         </Grid>
 
                                         <ItemsControl ItemsSource="{Binding Expenses}" Visibility="{Binding EditingExpenses, RelativeSource={RelativeSource AncestorType=Page}, Converter={StaticResource VisibleIfFalse}}">
@@ -701,12 +702,9 @@
                                                             <ColumnDefinition Width="24"/>
                                                         </Grid.ColumnDefinitions>
 
-                                                        <DatePicker Grid.Column="0" SelectedDate="{Binding Date, Mode=TwoWay}" Tag="{Binding}" Margin="0 0 4 0"
-                                                                    SelectedDateChanged="ExpenseDateChanged"/>
-                                                        <TextBox Grid.Column="1" Text="{Binding Description, Mode=TwoWay}" Tag="{Binding}"  Margin="0 0 4 0"
-                                                                 TextChanged="ExpenseDescriptionChanged"/>
-                                                        <TextBox Grid.Column="2" Text="{Binding Amount, Mode=TwoWay}" Tag="{Binding}"
-                                                                 TextChanged="ExpenseAmountChanged"/>
+                                                        <DatePicker Grid.Column="0" SelectedDate="{Binding Date, Mode=TwoWay}" Tag="{Binding}" Margin="0 0 4 0"/>
+                                                        <TextBox Grid.Column="1" Text="{Binding Description, Mode=TwoWay}" Tag="{Binding}"  Margin="0 0 4 0"/>
+                                                        <TextBox Grid.Column="2" Text="{Binding Amount, Mode=TwoWay}" Tag="{Binding}"/>
 
                                                         <local:CircularButton Grid.Column="3" Style="{StaticResource RemoveButton}" Width="20" Height="20" Padding="4"
                                                                               HighlightStroke="{StaticResource BtnMouseOverHighlight}"
@@ -782,16 +780,17 @@
 
                                 <ScrollViewer Grid.Row="2" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
                                     <StackPanel>
-                                        <Grid Margin="0 0 0 2" Visibility="{Binding AddingImprovement, RelativeSource={RelativeSource AncestorType=Page}, Converter={StaticResource VisibleIfTrue}}">
+                                        <Grid Margin="0 0 0 2" Visibility="{Binding AddingImprovement, RelativeSource={RelativeSource AncestorType=Page}, Converter={StaticResource VisibleIfTrue}}"
+                                              DataContext="{Binding NewImprovement}">
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition Width="3*"/>
                                                 <ColumnDefinition Width="10*"/>
                                                 <ColumnDefinition Width="3*"/>
                                             </Grid.ColumnDefinitions>
 
-                                            <DatePicker Grid.Column="0" Margin="0 0 4 0" SelectedDate="{Binding NewImprovement.Date, Mode=TwoWay}"/>
-                                            <TextBox Grid.Column="1" Margin="0 0 4 0" Text="{Binding NewImprovement.Description, Mode=TwoWay}"/>
-                                            <TextBox Grid.Column="2" Text="{Binding NewImprovement.Cost, Mode=TwoWay}"/>
+                                            <DatePicker Grid.Column="0" Name="newImprovementDatePicker" Margin="0 0 4 0" SelectedDate="{Binding Date, Mode=TwoWay}"/>
+                                            <TextBox Grid.Column="1" Name="newImprovementDescriptionTextBox" Margin="0 0 4 0" Text="{Binding Description, Mode=TwoWay}"/>
+                                            <TextBox Grid.Column="2"  Name="newImprovementCostTextBox" Text="{Binding Cost, Mode=TwoWay}"/>
                                         </Grid>
 
                                         <ItemsControl ItemsSource="{Binding Improvements}" Visibility="{Binding EditingImprovements, RelativeSource={RelativeSource AncestorType=Page}, Converter={StaticResource VisibleIfFalse}}">
@@ -835,12 +834,9 @@
                                                             <ColumnDefinition Width="24"/>
                                                         </Grid.ColumnDefinitions>
 
-                                                        <DatePicker Grid.Column="0" SelectedDate="{Binding Date, Mode=TwoWay}" Tag="{Binding}" Margin="0 0 4 0"
-                                                                    SelectedDateChanged="ImprovementDateChanged"/>
-                                                        <TextBox Grid.Column="1" Text="{Binding Description, Mode=TwoWay}" Tag="{Binding}" Margin="0 0 4 0"
-                                                                 TextChanged="ImprovementDescriptionChanged"/>
-                                                        <TextBox Grid.Column="2" Text="{Binding Cost, Mode=TwoWay}" Tag="{Binding}"
-                                                                 TextChanged="ImprovementCostChanged"/>
+                                                        <DatePicker Grid.Column="0" SelectedDate="{Binding Date, Mode=TwoWay}" Margin="0 0 4 0"/>
+                                                        <TextBox Grid.Column="1" Text="{Binding Description, Mode=TwoWay}" Margin="0 0 4 0"/>
+                                                        <TextBox Grid.Column="2" Text="{Binding Cost, Mode=TwoWay}"/>
 
                                                         <local:CircularButton Grid.Column="3" Style="{StaticResource RemoveButton}" Width="20" Height="20" Padding="4"
                                                                               HighlightStroke="{StaticResource BtnMouseOverHighlight}"

@@ -1,5 +1,4 @@
-﻿using PropertyManagementCommon.Model;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Text;
@@ -12,6 +11,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using PropertyManagementUi.ViewModels;
 
 namespace PropertyManagementUi
 {
@@ -22,9 +22,9 @@ namespace PropertyManagementUi
     {
         private AppController _appController;
 
-        public IndexPage(AppController navigationController, IndexViewModel viewModel)
+        public IndexPage(AppController appController, IndexViewModel viewModel)
         {
-            _appController = navigationController;
+            _appController = appController;
             ViewModel = viewModel;
 
             InitializeComponent();

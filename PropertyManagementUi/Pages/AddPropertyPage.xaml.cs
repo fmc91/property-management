@@ -1,5 +1,4 @@
-﻿using PropertyManagementCommon.Model;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -15,6 +14,9 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Microsoft.Win32;
+using PropertyManagementService.Model;
+using PropertyManagementUi.ViewModels;
 
 namespace PropertyManagementUi
 {
@@ -23,9 +25,9 @@ namespace PropertyManagementUi
     /// </summary>
     public partial class AddPropertyPage : Page, INotifyPropertyChanged
     {
-        private AppController _appController;
-
         private bool _addingOwner;
+
+        private AppController _appController;
 
         public AddPropertyPage(AppController appController, AddPropertyViewModel viewModel)
         {
@@ -58,12 +60,35 @@ namespace PropertyManagementUi
             }
         }
 
-        public void SaveButtonClick(object sender, RoutedEventArgs e)
+        private void LoadImageButtonClick(object sender, RoutedEventArgs e)
         {
+            var openFileDialog = new OpenFileDialog
+            {
+                Filter = "Image files|*.png;*.jpeg;*.jpg;*.bmp"
+            };
+
+            if (openFileDialog.ShowDialog() == true)
+                _appController.AddImage(openFileDialog.FileName, ViewModel);
+        }
+
+        private void ClearImageLinkClick(object sender, RoutedEventArgs e)
+        {
+            _appController.ClearImage(ViewModel);
+        }
+
+        private void SaveButtonClick(object sender, RoutedEventArgs e)
+        {
+            if (String.IsNullOrEmpty(ViewModel.StreetAddress1) ||
+                String.IsNullOrEmpty(ViewModel.City) ||
+                String.IsNullOrEmpty(ViewModel.Country) ||
+                String.IsNullOrEmpty(ViewModel.Postcode) ||
+                ViewModel.Owner == null)
+                return;
+            
             _appController.AddProperty(ViewModel);
         }
 
-        public void CancelButtonClick(object sender, RoutedEventArgs e)
+        private void CancelButtonClick(object sender, RoutedEventArgs e)
         {
             var messageBoxResult = MessageBox.Show("Are you sure you want to cancel? All unsaved data will be lost.", "Are you sure?", MessageBoxButton.YesNo);
 
@@ -71,46 +96,42 @@ namespace PropertyManagementUi
                 _appController.IndexPage();
         }
 
-        public void AddPurchaseCostButtonClick(object sender, RoutedEventArgs e)
+        private void AddPurchaseCostButtonClick(object sender, RoutedEventArgs e)
         {
             ViewModel.PurchaseCosts.Add(new PurchaseCost());
         }
 
-        public void RemovePurchaseCostButtonClick(object sender, RoutedEventArgs e)
+        private void RemovePurchaseCostButtonClick(object sender, RoutedEventArgs e)
         {
             var purchaseCost = (PurchaseCost)((Button)sender).Tag;
             ViewModel.PurchaseCosts.Remove(purchaseCost);
         }
 
-        public void NewOwnerButtonClick(object sender, RoutedEventArgs e)
+        private void NewOwnerButtonClick(object sender, RoutedEventArgs e)
         {
+            ViewModel.NewOwner = new Owner();
             AddingOwner = true;
         }
 
-        public void NewOwnerOkClick(object sender, RoutedEventArgs e)
+        private void NewOwnerOkClick(object sender, RoutedEventArgs e)
         {
             //NEED TO CHANGE VALIDATION
-            if (String.IsNullOrWhiteSpace(ViewModel.NewOwnerName)) return;
+            if (String.IsNullOrWhiteSpace(ViewModel.NewOwner.Name)) return;
 
-            var newOwner = new Owner { Name = ViewModel.NewOwnerName };
-            _appController.AddOwner(newOwner);
+            ViewModel.Owners.Add(ViewModel.NewOwner);
 
-            ViewModel.Owners = new ObservableCollection<Owner>(_appController.GetAllOwners());
-
-            ViewModel.Owner = ViewModel.Owners
-                .Where(o => o.OwnerId == newOwner.OwnerId)
-                .FirstOrDefault();
+            ViewModel.Owner = ViewModel.NewOwner;
 
             AddingOwner = false;
 
-            ViewModel.NewOwnerName = null;
+            ViewModel.NewOwner = null;
         }
 
-        public void NewOwnerCancelClick(object sender, RoutedEventArgs e)
+        private void NewOwnerCancelClick(object sender, RoutedEventArgs e)
         {
             AddingOwner = false;
 
-            ViewModel.NewOwnerName = null;
+            ViewModel.NewOwner = null;
         }
 
         protected void OnPropertyChanged([CallerMemberName] string propertyName = "")

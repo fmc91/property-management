@@ -1,16 +1,15 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup />
-  <ItemGroup>
-    <ApplicationDefinition Update="App.xaml">
-      <SubType>Designer</SubType>
-    </ApplicationDefinition>
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <Compile Update="Pages\AddPropertyPage.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Update="Pages\AddTenancyPage.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Pages\EditPropertyPage.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Update="Pages\EditTenancyPage.xaml.cs">
@@ -27,10 +26,16 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Page Update="App.xaml">
+      <SubType>Designer</SubType>
+    </Page>
     <Page Update="Pages\AddPropertyPage.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Pages\AddTenancyPage.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Pages\EditPropertyPage.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Pages\EditTenancyPage.xaml">

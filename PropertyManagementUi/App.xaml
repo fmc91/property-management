@@ -9,17 +9,17 @@
     
     <Application.Resources>
 
-        <collections:Hashtable x:Key="PurchaseCostTypeOptions">
-            <system:String x:Key="{x:Static common:PurchaseCostType.SurveyAndValuation}">Survey &amp; Valuation</system:String>
-            <system:String x:Key="{x:Static common:PurchaseCostType.MortgageCosts}">Mortgage Costs</system:String>
-            <system:String x:Key="{x:Static common:PurchaseCostType.LawyersFeesAndDisbursements}">Lawyers Fees &amp; Disbursements</system:String>
-            <system:String x:Key="{x:Static common:PurchaseCostType.StampDuty}">Stamp Duty</system:String>
+        <collections:Hashtable x:Key="PurchaseCostKindOptions">
+            <system:String x:Key="{x:Static common:PurchaseCostKind.SurveyAndValuation}">Survey &amp; Valuation</system:String>
+            <system:String x:Key="{x:Static common:PurchaseCostKind.MortgageCosts}">Mortgage Costs</system:String>
+            <system:String x:Key="{x:Static common:PurchaseCostKind.LawyersFeesAndDisbursements}">Lawyers Fees &amp; Disbursements</system:String>
+            <system:String x:Key="{x:Static common:PurchaseCostKind.StampDuty}">Stamp Duty</system:String>
         </collections:Hashtable>
 
-        <collections:Hashtable x:Key="PropertyTypeOptions">
-            <system:String x:Key="{x:Static common:PropertyType.Residential}">Residential</system:String>
-            <system:String x:Key="{x:Static common:PropertyType.Retail}">Retail</system:String>
-            <system:String x:Key="{x:Static common:PropertyType.Other}">Other</system:String>
+        <collections:Hashtable x:Key="PropertyKindOptions">
+            <system:String x:Key="{x:Static common:PropertyKind.Residential}">Residential</system:String>
+            <system:String x:Key="{x:Static common:PropertyKind.Retail}">Retail</system:String>
+            <system:String x:Key="{x:Static common:PropertyKind.Other}">Other</system:String>
         </collections:Hashtable>
 
         <collections:Hashtable x:Key="PaymentFrequencyOptions">
@@ -28,7 +28,9 @@
             <system:String x:Key="{x:Static common:PaymentFrequency.Weekly}">Weekly</system:String>
         </collections:Hashtable>
 
-        <local:HashtableConverter x:Key="PurchaseCostTypeConverter" ConversionTable="{StaticResource PurchaseCostTypeOptions}"/>
+        <local:HashtableConverter x:Key="PurchaseCostKindConverter" ConversionTable="{StaticResource PurchaseCostKindOptions}"/>
+        <local:HashtableConverter x:Key="PropertyKindConverter" ConversionTable="{StaticResource PropertyKindOptions}"/>
+        <local:HashtableConverter x:Key="PaymentFrequencyConverter" ConversionTable="{StaticResource PaymentFrequencyOptions}"/>
 
         <local:BooleanInverter x:Key="BoolInverter"/>
         <local:BoolVisibilityConverter x:Key="VisibleIfTrue"/>
@@ -39,6 +41,8 @@
         <local:NonEmptyVisibilityConverter x:Key="VisibleIfEmpty" InvertLogic="True"/>
         <local:NullOrEmptyVisibilityConverter x:Key="VisibleIfNotNullOrEmpty"/>
         <local:DateBrushConverter x:Key="DateBrush" AmberThreshold="3" RedThreshold="1"/>
+        <local:DateBoolConverter x:Key="TrueIfDateGreater" Inclusive="False" InvertLogic="False"/>
+        <local:TemplateImageConverter x:Key="TemplateImageConverter"/>
 
         <BitmapImage x:Key="HouseImg" UriSource="pack://application:,,,/PropertyManagementUi;component/Images/house.png"/>
         <BitmapImage x:Key="InsuranceIcon" UriSource="pack://application:,,,/PropertyManagementUi;component/Icons/insurance.png"/>

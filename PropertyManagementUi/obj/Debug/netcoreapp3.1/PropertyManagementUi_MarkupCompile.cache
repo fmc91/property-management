@@ -8,12 +8,12 @@ C:\Users\fazal\source\repos\PropertyManagementSystem\PropertyManagementUi\obj\De
 PropertyManagementUi
 none
 false
-TRACE;DEBUG;NETCOREAPP;NETCOREAPP3_1
+TRACE;DEBUG;NETCOREAPP;NETCOREAPP3_1;
 C:\Users\fazal\source\repos\PropertyManagementSystem\PropertyManagementUi\App.xaml
-71830951853
+7222147183
 
-29-794538253
-2151192823823
+361956776984
+2192042627886
 Pages\AddPropertyPage.xaml;Pages\AddTenancyPage.xaml;Pages\EditTenancyPage.xaml;Pages\IndexPage.xaml;Pages\PropertyDetailsPage.xaml;Pages\TenancyDetailsPage.xaml;Themes\Generic.xaml;
 
 False

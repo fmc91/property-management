@@ -1,13 +1,13 @@
-﻿using PropertyManagementCommon;
-using PropertyManagementCommon.Model;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Text;
+using PropertyManagementCommon;
+using PropertyManagementService.Model;
 
-namespace PropertyManagementUi
+namespace PropertyManagementUi.ViewModels
 {
     public class AddTenancyViewModel : INotifyPropertyChanged
     {
@@ -29,19 +29,21 @@ namespace PropertyManagementUi
 
         public int PropertyId { get; set; }
 
-        public Agent NewAgent
-        {
-            get { return _newAgent; }
+        public DateTime StartDate { get; set; }
 
-            set
-            {
-                if (_newAgent != value)
-                {
-                    _newAgent = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
+        public DateTime EndDate { get; set; }
+
+        public DateTime FirstPayment { get; set; }
+
+        public PaymentFrequency PaymentFrequency { get; set; }
+
+        public double Deposit { get; set; }
+
+        public ObservableCollection<Tenant> Tenants { get; }
+
+        public ObservableCollection<Rate> Rates { get; }
+
+        public ObservableCollection<Agent> Agents { get; set; }
 
         public Agent Agent
         {
@@ -57,21 +59,19 @@ namespace PropertyManagementUi
             }
         }
 
-        public ObservableCollection<Tenant> Tenants { get; }
+        public Agent NewAgent
+        {
+            get { return _newAgent; }
 
-        public ObservableCollection<Rate> Rates { get; }
-
-        public ObservableCollection<Agent> Agents { get; set; }
-
-        public DateTime StartDate { get; set; }
-
-        public DateTime EndDate { get; set; }
-
-        public DateTime FirstPayment { get; set; }
-
-        public PaymentFrequency PaymentFrequency { get; set; }
-
-        public double DepositAmount { get; set; }
+            set
+            {
+                if (_newAgent != value)
+                {
+                    _newAgent = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
 
         private void OnPropertyChanged([CallerMemberName] string propertyName = "")
         {

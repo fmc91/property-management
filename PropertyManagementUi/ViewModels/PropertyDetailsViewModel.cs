@@ -1,20 +1,21 @@
-﻿using PropertyManagementCommon;
-using PropertyManagementCommon.Model;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Windows.Media;
+using PropertyManagementCommon;
+using PropertyManagementService.Model;
 
-namespace PropertyManagementUi
+namespace PropertyManagementUi.ViewModels
 {
     public class PropertyDetailsViewModel : INotifyPropertyChanged
     {
-        private InsuranceViewModel _insurance;
+        private InsurancePolicy _insurancePolicy;
 
-        private NewInsuranceViewModel _newInsurance;
+        private NewInsurancePolicyViewModel _newInsurance;
 
         private ElectricalInspectionCertificate _electricalInspectionCertificate;
 
@@ -47,13 +48,15 @@ namespace PropertyManagementUi
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        public ImageSource ImageSource { get; set; }
+        public int? ImageId { get; set; }
+
+        public string ImagePath { get; set; }
 
         public int PropertyId { get; set; }
 
-        public PropertyType PropertyType { get; set; }
+        public PropertyKind PropertyKind { get; set; }
 
-        public string Owner { get; set; }
+        public Owner Owner { get; set; }
 
         public string StreetAddress1 { get; set; }
 
@@ -69,29 +72,29 @@ namespace PropertyManagementUi
 
         public string Postcode { get; set; }
 
-        public TenancyViewModel CurrentTenancy { get; set; }
+        public TenancySummaryViewModel Tenancy { get; set; }
 
-        public DateTime? PurchaseDate { get; set; }
+        public DateTime PurchaseDate { get; set; }
 
-        public double? PurchasePrice { get; set; }
+        public double PurchasePrice { get; set; }
 
         public List<PurchaseCost> PurchaseCosts { get; set; }
 
-        public InsuranceViewModel Insurance
+        public InsurancePolicy InsurancePolicy
         {
-            get { return _insurance; }
+            get { return _insurancePolicy; }
 
             set
             {
-                if (_insurance != value)
+                if (_insurancePolicy != value)
                 {
-                    _insurance = value;
+                    _insurancePolicy = value;
                     OnPropertyChanged();
                 }
             }
         }
 
-        public NewInsuranceViewModel NewInsurance
+        public NewInsurancePolicyViewModel NewInsurancePolicy
         {
             get { return _newInsurance; }
 
@@ -217,10 +220,6 @@ namespace PropertyManagementUi
             }
         }
 
-        public double TotalExpenses { get; set; }
-
-        public double TotalImprovementCost { get; set; }
-
         public ObservableCollection<Expense> Expenses
         {
             get { return _expenses; }
@@ -276,5 +275,9 @@ namespace PropertyManagementUi
                 }
             }
         }
+
+        public double TotalExpenses => Expenses.Sum(e => e.Amount);
+
+        public double TotalImprovementCost => Improvements.Sum(i => i.Cost);
     }
 }
