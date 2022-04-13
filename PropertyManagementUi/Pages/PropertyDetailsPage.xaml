@@ -308,7 +308,7 @@
                             <TextBlock.Visibility>
                                 <MultiBinding Converter="{StaticResource AndVisibilityConverter}">
                                     <Binding Path="InsurancePolicy" Converter="{StaticResource TrueIfNull}"/>
-                                    <Binding Path="AddingInsurance" RelativeSource="{RelativeSource  AncestorType=Page}" Converter="{StaticResource BoolInverter}"/>
+                                    <Binding Path="AddingInsurance" RelativeSource="{RelativeSource  AncestorType=Page}" Converter="{StaticResource NotConverter}"/>
                                 </MultiBinding>
                             </TextBlock.Visibility>
                         </TextBlock>
@@ -318,7 +318,7 @@
                             <StackPanel.Visibility>
                                 <MultiBinding Converter="{StaticResource AndVisibilityConverter}">
                                     <Binding Path="." Converter="{StaticResource TrueIfNotNull}"/>
-                                    <Binding Path="AddingInsurance" RelativeSource="{RelativeSource  AncestorType=Page}" Converter="{StaticResource BoolInverter}"/>
+                                    <Binding Path="AddingInsurance" RelativeSource="{RelativeSource  AncestorType=Page}" Converter="{StaticResource NotConverter}"/>
                                 </MultiBinding>
                             </StackPanel.Visibility>
                             
@@ -468,7 +468,7 @@
                                 <TextBlock.Visibility>
                                     <MultiBinding Converter="{StaticResource AndVisibilityConverter}">
                                         <Binding Path="ElectricalInspectionCertificate" Converter="{StaticResource TrueIfNull}"/>
-                                        <Binding Path="AddingElectricalCertificate" RelativeSource="{RelativeSource AncestorType=Page}" Converter="{StaticResource BoolInverter}"/>
+                                        <Binding Path="AddingElectricalCertificate" RelativeSource="{RelativeSource AncestorType=Page}" Converter="{StaticResource NotConverter}"/>
                                     </MultiBinding>
                                 </TextBlock.Visibility>
                             </TextBlock>
@@ -478,7 +478,7 @@
                                 <StackPanel.Visibility>
                                     <MultiBinding Converter="{StaticResource AndVisibilityConverter}">
                                         <Binding Path="." Converter="{StaticResource TrueIfNotNull}"/>
-                                        <Binding Path="AddingElectricalCertificate" RelativeSource="{RelativeSource AncestorType=Page}" Converter="{StaticResource BoolInverter}"/>
+                                        <Binding Path="AddingElectricalCertificate" RelativeSource="{RelativeSource AncestorType=Page}" Converter="{StaticResource NotConverter}"/>
                                     </MultiBinding>
                                 </StackPanel.Visibility>
                                 
@@ -528,7 +528,7 @@
                                 <TextBlock.Visibility>
                                     <MultiBinding Converter="{StaticResource AndVisibilityConverter}">
                                         <Binding Path="GasSafetyCertificate" Converter="{StaticResource TrueIfNull}"/>
-                                        <Binding Path="AddingGasCertificate" RelativeSource="{RelativeSource AncestorType=Page}" Converter="{StaticResource BoolInverter}"/>
+                                        <Binding Path="AddingGasCertificate" RelativeSource="{RelativeSource AncestorType=Page}" Converter="{StaticResource NotConverter}"/>
                                     </MultiBinding>
                                 </TextBlock.Visibility>
                             </TextBlock>
@@ -538,7 +538,7 @@
                                 <StackPanel.Visibility>
                                     <MultiBinding Converter="{StaticResource AndVisibilityConverter}">
                                         <Binding Path="." Converter="{StaticResource TrueIfNotNull}"/>
-                                        <Binding Path="AddingGasCertificate" RelativeSource="{RelativeSource AncestorType=Page}" Converter="{StaticResource BoolInverter}"/>
+                                        <Binding Path="AddingGasCertificate" RelativeSource="{RelativeSource AncestorType=Page}" Converter="{StaticResource NotConverter}"/>
                                     </MultiBinding>
                                 </StackPanel.Visibility>
 
@@ -588,7 +588,7 @@
                                 <TextBlock.Visibility>
                                     <MultiBinding Converter="{StaticResource AndVisibilityConverter}">
                                         <Binding Path="EnergyPerformanceCertificate" Converter="{StaticResource TrueIfNull}"/>
-                                        <Binding Path="AddingEnergyCertificate" RelativeSource="{RelativeSource AncestorType=Page}" Converter="{StaticResource BoolInverter}"/>
+                                        <Binding Path="AddingEnergyCertificate" RelativeSource="{RelativeSource AncestorType=Page}" Converter="{StaticResource NotConverter}"/>
                                     </MultiBinding>
                                 </TextBlock.Visibility>
                             </TextBlock>
@@ -597,7 +597,7 @@
                                 <StackPanel.Visibility>
                                     <MultiBinding Converter="{StaticResource AndVisibilityConverter}">
                                         <Binding Path="." Converter="{StaticResource TrueIfNotNull}"/>
-                                        <Binding Path="AddingEnergyCertificate" RelativeSource="{RelativeSource AncestorType=Page}" Converter="{StaticResource BoolInverter}"/>
+                                        <Binding Path="AddingEnergyCertificate" RelativeSource="{RelativeSource AncestorType=Page}" Converter="{StaticResource NotConverter}"/>
                                     </MultiBinding>
                                 </StackPanel.Visibility>
                                 <DockPanel Margin="0 0 0 4">

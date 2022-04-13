@@ -5,7 +5,6 @@ using System.IO;
 using System.Text;
 using System.Windows.Navigation;
 using AutoMapper;
-using PropertyManagementBootstrap;
 using PropertyManagementCommon;
 using PropertyManagementService;
 using PropertyManagementService.Model;

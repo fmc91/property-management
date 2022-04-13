@@ -9,7 +9,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ProjectManagementService\PropertyManagementService.csproj" />
-    <ProjectReference Include="..\PropertyManagementBootstrap\PropertyManagementBootstrap.csproj" />
   </ItemGroup>
 
 </Project>

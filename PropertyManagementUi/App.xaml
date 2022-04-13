@@ -32,21 +32,25 @@
         <local:HashtableConverter x:Key="PropertyKindConverter" ConversionTable="{StaticResource PropertyKindOptions}"/>
         <local:HashtableConverter x:Key="PaymentFrequencyConverter" ConversionTable="{StaticResource PaymentFrequencyOptions}"/>
 
-        <local:BooleanInverter x:Key="BoolInverter"/>
+        <local:NotConverter x:Key="NotConverter"/>
         <local:BoolVisibilityConverter x:Key="VisibleIfTrue"/>
-        <local:BoolVisibilityConverter x:Key="VisibleIfFalse" InvertLogic="True"/>
-        <local:NullBoolConverter x:Key="TrueIfNotNull"/>
-        <local:NullBoolConverter x:Key="TrueIfNull" InvertLogic="True"/>
-        <local:NullVisibilityConverter x:Key="VisibleIfNotNull"/>
-        <local:NullVisibilityConverter x:Key="VisibleIfNull" InvertLogic="True"/>
-        <local:NonEmptyVisibilityConverter x:Key="VisibleIfNonEmpty"/>
-        <local:NonEmptyVisibilityConverter x:Key="VisibleIfEmpty" InvertLogic="True"/>
-        <local:NullOrEmptyVisibilityConverter x:Key="VisibleIfNotNullOrEmpty"/>
-        <local:AndVisibilityConverter x:Key="AndVisibilityConverter"/>
-        <local:OrVisibilityConverter x:Key="NorVisibilityConverter" InvertOutput="True"/>
-        <local:OrConverter x:Key="NorConverter" InvertOutput="True"/>
+        <local:NotConverter x:Key="VisibleIfFalse" OutputConverter="{StaticResource VisibleIfTrue}"/>
+        
+        <local:NullityBoolConverter x:Key="TrueIfNotNull"/>
+        <local:NullityBoolConverter x:Key="TrueIfNull" OutputConverter="{StaticResource NotConverter}"/>
+        <local:NullityBoolConverter x:Key="VisibleIfNotNull" OutputConverter="{StaticResource VisibleIfTrue}"/>
+        <local:NullityBoolConverter x:Key="VisibleIfNull" OutputConverter="{StaticResource VisibleIfFalse}"/>
+        
+        <local:CollectionNonEmptyConverter x:Key="VisibleIfNonEmpty" OutputConverter="{StaticResource VisibleIfTrue}"/>
+        <local:CollectionNonEmptyConverter x:Key="VisibleIfEmpty" OutputConverter="{StaticResource VisibleIfFalse}"/>
+        <local:StringNullOrEmptyConverter x:Key="VisibleIfNotNullOrEmpty" OutputConverter="{StaticResource VisibleIfFalse}"/>
+        
+        <local:LogicConverter x:Key="AndVisibilityConverter" Function="AND" OutputConverter="{StaticResource VisibleIfTrue}"/>
+        <local:LogicConverter x:Key="NorVisibilityConverter" Function="NOR" OutputConverter="{StaticResource VisibleIfTrue}"/>
+        <local:LogicConverter x:Key="NorConverter" Function="NOR"/>
+
         <local:DateBrushConverter x:Key="DateBrush" AmberThreshold="3" RedThreshold="1"/>
-        <local:DateBoolConverter x:Key="TrueIfDateGreater" Inclusive="False" InvertLogic="False"/>
+        <local:DateComparisonConverter x:Key="TrueIfDateGreater" Operator="GREATER"/>
         <local:TemplateImageConverter x:Key="TemplateImageConverter"/>
 
         <BitmapImage x:Key="HouseImg" UriSource="pack://application:,,,/PropertyManagementUi;component/Images/house.png"/>

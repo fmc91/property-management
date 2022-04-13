@@ -24,7 +24,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ProjectManagementService\PropertyManagementService.csproj" />
-    <ProjectReference Include="..\PropertyManagementBootstrap\PropertyManagementBootstrap.csproj" />
     <ProjectReference Include="..\PropertyManagementCommon\PropertyManagementCommon.csproj" />
   </ItemGroup>
 

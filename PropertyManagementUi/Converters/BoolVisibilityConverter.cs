@@ -9,11 +9,13 @@ namespace PropertyManagementUi
 {
     public class BoolVisibilityConverter : IValueConverter
     {
-        public bool InvertLogic { get; set; }
+        public IValueConverter OutputConverter { get; set; }
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return (value is bool b && b) ^ InvertLogic ? Visibility.Visible : Visibility.Collapsed;
+            var result = (value is bool b && b) ? Visibility.Visible : Visibility.Collapsed;
+
+            return OutputConverter == null ? result : OutputConverter.Convert(result, targetType, parameter, culture);
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

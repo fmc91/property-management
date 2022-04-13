@@ -7,11 +7,15 @@ using System.Windows.Data;
 
 namespace PropertyManagementUi
 {
-    class BooleanInverter : IValueConverter
+    public class NotConverter : IValueConverter
     {
+        public IValueConverter OutputConverter { get; set; }
+
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return value is bool b && !b;
+            object result = value is bool b ? !b : null;
+
+            return OutputConverter == null ? result : OutputConverter.Convert(result, targetType, parameter, culture);
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

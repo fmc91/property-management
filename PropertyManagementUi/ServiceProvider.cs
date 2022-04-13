@@ -4,11 +4,8 @@ using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using PropertyManagementData;
 using PropertyManagementService;
-using PropertyManagementService.Model;
-using PropertyManagementService.Profiles;
-using Entities = PropertyManagementData.Model;
 
-namespace PropertyManagementBootstrap
+namespace PropertyManagementUi
 {
     public class ServiceProvider
     {

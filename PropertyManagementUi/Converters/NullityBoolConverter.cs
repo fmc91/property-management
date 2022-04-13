@@ -1,19 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Text;
-using System.Windows;
+using System.Threading.Tasks;
 using System.Windows.Data;
 
 namespace PropertyManagementUi
 {
-    public class NullVisibilityConverter : IValueConverter
+    public class NullityBoolConverter : IValueConverter
     {
-        public bool InvertLogic { get; set; }
+        public IValueConverter OutputConverter { get; set; }
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return value == null ^ InvertLogic ? Visibility.Collapsed : Visibility.Visible;
+            var result = value != null;
+
+            return OutputConverter == null ? result : OutputConverter.Convert(result, targetType, parameter, culture);
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

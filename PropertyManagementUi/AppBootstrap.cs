@@ -9,13 +9,16 @@ using PropertyManagementService.Profiles;
 using Entities = PropertyManagementData.Model;
 using Microsoft.EntityFrameworkCore;
 using PropertyManagementData;
+using PropertyManagementUi.Profiles;
+using PropertyManagementUi.ViewModels;
 
-namespace PropertyManagementBootstrap
+namespace PropertyManagementUi
 {
     public static class AppBootstrap
     {
-        private static MapperConfiguration CreateMapperConfig() => new MapperConfiguration(cfg =>
+        public static MapperConfiguration CreateMapperConfig() => new MapperConfiguration(cfg =>
         {
+            //Entity Layer <==> Domain Layer
             cfg.AddProfile<AccountEntryProfile>();
             cfg.AddProfile<ElectricalInspectionCertificateProfile>();
             cfg.AddProfile<EnergyPerformanceCertificateProfile>();
@@ -40,6 +43,18 @@ namespace PropertyManagementBootstrap
                 .ReverseMap();
             cfg.CreateMap<Entities.ScheduledPayment, ScheduledPayment>()
                 .ReverseMap();
+
+            //Domain Layer <==> UI Layer
+            cfg.AddProfile<NewInsurancePolicyProfile>();
+            cfg.AddProfile<AddPropertyProfile>();
+            cfg.AddProfile<EditPropertyProfile>();
+            cfg.AddProfile<AddTenancyProfile>();
+            cfg.AddProfile<EditTenancyProfile>();
+            cfg.AddProfile<PropertyDetailsProfile>();
+            cfg.AddProfile<PropertySummaryProfile>();
+            cfg.AddProfile<TenancyDetailsProfile>();
+
+            cfg.CreateMap<Tenancy, TenancySummaryViewModel>();
         });
 
         private static DbContextOptions<PropertyManagementContext> CreateDbContextOptions()

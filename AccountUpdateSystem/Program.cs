@@ -1,7 +1,6 @@
 ﻿using System;
 using PropertyManagementService;
 using PropertyManagementService.Model;
-using PropertyManagementBootstrap;
 using PropertyManagementCommon;
 
 namespace AccountUpdateSystem
@@ -10,26 +9,26 @@ namespace AccountUpdateSystem
     {
         public static void Main(string[] args)
         {
-            var serviceProvider = AppBootstrap.GetServiceProvider();
+            //var serviceProvider = AppBootstrap.GetServiceProvider();
 
-            using var propertyService = serviceProvider.GetPropertyService();
+            //using var propertyService = serviceProvider.GetPropertyService();
 
-            var scheduledPayments = propertyService.GetActionableScheduledPayments();
+            //var scheduledPayments = propertyService.GetActionableScheduledPayments();
 
-            foreach (var p in scheduledPayments)
-            {
-                p.Tenancy.AccountEntries.Add(new AccountEntry
-                {
-                    Date = p.Date,
-                    Kind = AccountEntryKind.AmountOwed,
-                    Amount = p.Amount * -1,
-                    Description = $"Rent payment due {p.Date:dd/MM/yyyy}"
-                });
+            //foreach (var p in scheduledPayments)
+            //{
+            //    p.Tenancy.AccountEntries.Add(new AccountEntry
+            //    {
+            //        Date = p.Date,
+            //        Kind = AccountEntryKind.AmountOwed,
+            //        Amount = p.Amount * -1,
+            //        Description = $"Rent payment due {p.Date:dd/MM/yyyy}"
+            //    });
 
-                p.Processed = true;
+            //    p.Processed = true;
 
-                propertyService.UpdateScheduledPayment(p);
-            }
+            //    propertyService.UpdateScheduledPayment(p);
+            //}
         }
     }
 }
