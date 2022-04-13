@@ -23,8 +23,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ProjectManagementService\PropertyManagementService.csproj" />
     <ProjectReference Include="..\PropertyManagementCommon\PropertyManagementCommon.csproj" />
+    <ProjectReference Include="..\PropertyManagementService\PropertyManagementService.csproj" />
   </ItemGroup>
 
   <ItemGroup>
