@@ -1,7 +1,8 @@
 ﻿using System;
-using PropertyManagementService;
-using PropertyManagementService.Model;
+using Microsoft.EntityFrameworkCore;
 using PropertyManagementCommon;
+using PropertyManagementData;
+using PropertyManagementData.Model;
 
 namespace AccountUpdateSystem
 {
@@ -9,26 +10,34 @@ namespace AccountUpdateSystem
     {
         public static void Main(string[] args)
         {
-            //var serviceProvider = AppBootstrap.GetServiceProvider();
+            var db = new PropertyManagementContext(CreateDbContextOptions());
 
-            //using var propertyService = serviceProvider.GetPropertyService();
+            var scheduledPayments = db.ScheduledPayment
+                .Where(p => !p.Processed && p.Date <= DateTime.Today);
 
-            //var scheduledPayments = propertyService.GetActionableScheduledPayments();
+            foreach (var p in scheduledPayments)
+            {
+                p.Tenancy.AccountEntries.Add(new AccountEntry
+                {
+                    Date = p.Date,
+                    Kind = AccountEntryKind.AmountOwed,
+                    Amount = p.Amount * -1,
+                    Description = $"Rent payment due {p.Date:dd/MM/yyyy}"
+                });
 
-            //foreach (var p in scheduledPayments)
-            //{
-            //    p.Tenancy.AccountEntries.Add(new AccountEntry
-            //    {
-            //        Date = p.Date,
-            //        Kind = AccountEntryKind.AmountOwed,
-            //        Amount = p.Amount * -1,
-            //        Description = $"Rent payment due {p.Date:dd/MM/yyyy}"
-            //    });
+                p.Processed = true;
+            }
 
-            //    p.Processed = true;
+            db.SaveChanges();
+        }
 
-            //    propertyService.UpdateScheduledPayment(p);
-            //}
+        private static DbContextOptions<PropertyManagementContext> CreateDbContextOptions()
+        {
+            var builder = new DbContextOptionsBuilder<PropertyManagementContext>()
+                .UseLazyLoadingProxies()
+                .UseSqlite(@"Data Source=C:\Users\fazal\source\repos\PropertyManagementSystem\PropertyManagementData\PropertyManagement.db");
+
+            return builder.Options;
         }
     }
 }

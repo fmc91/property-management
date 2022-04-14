@@ -177,14 +177,6 @@ namespace PropertyManagementService
             _db.SaveChanges();
         }
 
-        public IEnumerable<ScheduledPayment> GetActionableScheduledPayments()
-        {
-            return _db.ScheduledPayment
-                .Where(p => !p.Processed && p.Date <= DateTime.Today)
-                .OrderBy(p => p.Date)
-                .Select(p => _mapper.Map<ScheduledPayment>(p));
-        }
-
         public void AddScheduledPayments(IEnumerable<ScheduledPayment> scheduledPayments)
         {
             _db.ScheduledPayment.AddRange(scheduledPayments.Select(p => _mapper.Map<ScheduledPaymentEntity>(p)));
@@ -254,7 +246,6 @@ namespace PropertyManagementService
         {
             var propertyEntity = _db.Property.Find(propertyId);
             _mapper.Map(improvements, propertyEntity.Improvements);
-            //_db.Property.Update(propertyEntity);
             _db.SaveChanges();
         }
 
@@ -269,7 +260,6 @@ namespace PropertyManagementService
         {
             var propertyEntity = _db.Property.Find(propertyId);
             _mapper.Map(expenses, propertyEntity.Expenses);
-            //_db.Property.Update(propertyEntity);
             _db.SaveChanges();
         }
 
