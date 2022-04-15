@@ -48,7 +48,7 @@ namespace PropertyManagementUi
                 });
         }
 
-        private static MapperConfiguration CreateMapperConfig() => new MapperConfiguration(cfg =>
+        private static MapperConfiguration CreateMapperConfig() => new(cfg =>
         {
             //Entity Layer <==> Domain Layer
             cfg.AddProfile<AccountEntryProfile>();
