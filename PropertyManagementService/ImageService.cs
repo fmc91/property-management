@@ -1,28 +1,30 @@
-﻿using PropertyManagementData;
-using PropertyManagementData.Model;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using PropertyManagementData;
+using PropertyManagementData.Model;
 
 namespace PropertyManagementService
 {
     public class ImageService : IDisposable
     {
-        private PropertyManagementContext _db;
+        private IDbContextFactory<PropertyManagementContext> _dbContextFactory;
 
-        private string _saveDirectoryPath;
+        private string _saveDirectoryPath = Path.Combine(Directory.GetCurrentDirectory(), "property-img");
 
-        public ImageService(PropertyManagementContext db, string saveDirectoryPath)
+        public ImageService(IDbContextFactory<PropertyManagementContext> dbContextFactory)
         {
-            _db = db;
-            _saveDirectoryPath = saveDirectoryPath;
+            _dbContextFactory = dbContextFactory;
         }
 
         public int SaveImage(string sourcePath)
         {
+            using var db = _dbContextFactory.CreateDbContext();
+
             if (String.IsNullOrWhiteSpace(sourcePath))
                 throw new ArgumentException(nameof(sourcePath));
 
@@ -35,35 +37,38 @@ namespace PropertyManagementService
             File.Copy(sourcePath, newPath);
 
             var newImage = new Image { FileName = fileName };
-            _db.Image.Add(newImage);
+            db.Image.Add(newImage);
 
-            _db.SaveChanges();
+            db.SaveChanges();
 
             return newImage.ImageId;
         }
 
         public string GetImagePath(int imageId)
         {
-            var image = _db.Image.Find(imageId);
+            using var db = _dbContextFactory.CreateDbContext();
+            var image = db.Image.Find(imageId);
 
-           return Path.Combine(_saveDirectoryPath, image.FileName);
+            return Path.Combine(_saveDirectoryPath, image.FileName);
         }
 
         public void DeleteImage(int imageId)
         {
-            var image = _db.Image.Find(imageId);
+            using var db = _dbContextFactory.CreateDbContext();
+
+            var image = db.Image.Find(imageId);
 
             string path = Path.Combine(_saveDirectoryPath, image.FileName);
 
             File.Delete(path);
 
-            _db.Image.Remove(image);
-            _db.SaveChanges();
+            db.Image.Remove(image);
+            db.SaveChanges();
         }
 
         public void Dispose()
         {
-            _db.Dispose();
+            //db.Dispose();
         }
     }
 }

@@ -38,24 +38,6 @@ namespace PropertyManagementService
 
                     prevDate = paymentDate;
                 }
-
-                //DateTime paymentDate = firstPayment;
-
-                //while (paymentDate < rate.StartDate)
-                //    paymentDate = increment(paymentDate);
-
-                //while (paymentDate <= rate.EndDate)
-                //{
-                //    result.Add(new AccountEntry
-                //    {
-                //        Date = paymentDate,
-                //        Amount = rate.Amount,
-                //        Kind = AccountEntryKind.AmountOwed,
-                //        Description = $"Rent due {paymentDate:dd/MM/yyyy}"
-                //    });
-
-                //    paymentDate = increment(paymentDate);
-                //}
             }
 
             return result;
@@ -128,7 +110,7 @@ namespace PropertyManagementService
             return false;
         }
 
-        public bool CheckRatesFallWithinTenacyPeriod(IEnumerable<Rate> rates, DateTime tenancyStartDate, DateTime tenancyEndDate)
+        public bool CheckRatesFallWithinTenancyPeriod(IEnumerable<Rate> rates, DateTime tenancyStartDate, DateTime tenancyEndDate)
         {
             return rates.OrderBy(r => r.StartDate).First().StartDate >= tenancyStartDate &&
                 rates.OrderByDescending(r => r.EndDate).First().EndDate <= tenancyEndDate;

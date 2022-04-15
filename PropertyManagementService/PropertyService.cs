@@ -25,110 +25,142 @@ namespace PropertyManagementService
 {
     public class PropertyService : IDisposable
     {
-        private PropertyManagementContext _db;
+        private IDbContextFactory<PropertyManagementContext> _dbContextFactory;
 
         private IMapper _mapper;
 
-        public PropertyService(PropertyManagementContext db, IMapper mapper)
+        public PropertyService(IDbContextFactory<PropertyManagementContext> dbContextFactory, IMapper mapper)
         {
-            _db = db;
+            _dbContextFactory = dbContextFactory;
             _mapper = mapper;
         }
 
         public List<Agent> GetAllAgents()
         {
-            return _db.Agent.Select(a => _mapper.Map<Agent>(a))
+            using var db = _dbContextFactory.CreateDbContext();
+
+            return db.Agent.Select(a => _mapper.Map<Agent>(a))
                 .ToList();
         }
 
         public Agent GetAgent(int agentId)
         {
-            return _mapper.Map<Agent>(_db.Agent.Find(agentId));
+            using var db = _dbContextFactory.CreateDbContext();
+
+            return _mapper.Map<Agent>(db.Agent.Find(agentId));
         }
 
         public void AddAgent(Agent agent)
         {
-            _db.Agent.Add(_mapper.Map<AgentEntity>(agent));
-            _db.SaveChanges();
+            using var db = _dbContextFactory.CreateDbContext();
+
+            db.Agent.Add(_mapper.Map<AgentEntity>(agent));
+            db.SaveChanges();
         }
 
         public List<Broker> GetAllBrokers()
         {
-            return _db.Broker.Select(b => _mapper.Map<Broker>(b))
+            using var db = _dbContextFactory.CreateDbContext();
+
+            return db.Broker.Select(b => _mapper.Map<Broker>(b))
                 .ToList();
         }
 
         public Broker GetBroker(int brokerId)
         {
-            return _mapper.Map<Broker>(_db.Broker.Find(brokerId));
+            using var db = _dbContextFactory.CreateDbContext();
+
+            return _mapper.Map<Broker>(db.Broker.Find(brokerId));
         }
 
         public void AddBroker(Broker broker)
         {
-            _db.Broker.Add(_mapper.Map<BrokerEntity>(broker));
-            _db.SaveChanges();
+            using var db = _dbContextFactory.CreateDbContext();
+
+            db.Broker.Add(_mapper.Map<BrokerEntity>(broker));
+            db.SaveChanges();
         }
 
         public List<Owner> GetAllOwners()
         {
-            return _db.Owner.Select(i => _mapper.Map<Owner>(i))
+            using var db = _dbContextFactory.CreateDbContext();
+
+            return db.Owner.Select(i => _mapper.Map<Owner>(i))
                 .ToList();
         }
 
         public Owner GetOwner(int ownerId)
         {
-            return _mapper.Map<Owner>(_db.Broker.Find(ownerId));
+            using var db = _dbContextFactory.CreateDbContext();
+
+            return _mapper.Map<Owner>(db.Broker.Find(ownerId));
         }
 
         public void AddOwner(Owner owner)
         {
-            _db.Owner.Add(_mapper.Map<OwnerEntity>(owner));
-            _db.SaveChanges();
+            using var db = _dbContextFactory.CreateDbContext();
+
+            db.Owner.Add(_mapper.Map<OwnerEntity>(owner));
+            db.SaveChanges();
         }
 
         public List<Insurer> GetAllInsurers()
         {
-            return _db.Insurer.Select(i => _mapper.Map<Insurer>(i))
+            using var db = _dbContextFactory.CreateDbContext();
+
+            return db.Insurer.Select(i => _mapper.Map<Insurer>(i))
                 .ToList();
         }
 
         public Insurer GetInsurer(int insurerId)
         {
-            return _mapper.Map<Insurer>(_db.Insurer.Find(insurerId));
+            using var db = _dbContextFactory.CreateDbContext();
+
+            return _mapper.Map<Insurer>(db.Insurer.Find(insurerId));
         }
 
         public void AddInsurer(Insurer insurer)
         {
-            _db.Insurer.Add(_mapper.Map<InsurerEntity>(insurer));
-            _db.SaveChanges();
+            using var db = _dbContextFactory.CreateDbContext();
+
+            db.Insurer.Add(_mapper.Map<InsurerEntity>(insurer));
+            db.SaveChanges();
         }
 
         public IEnumerable<Property> GetAllProperties()
         {
-            return _mapper.Map<IEnumerable<Property>>(_db.Property);
+            using var db = _dbContextFactory.CreateDbContext();
+
+            return _mapper.Map<IEnumerable<Property>>(db.Property);
         }
 
         public Property GetProperty(int propertyId)
         {
-            return _mapper.Map<Property>(_db.Property.Find(propertyId));
+            using var db = _dbContextFactory.CreateDbContext();
+
+            return _mapper.Map<Property>(db.Property.Find(propertyId));
         }
 
         public void AddProperty(Property property)
         {
+            using var db = _dbContextFactory.CreateDbContext();
+
             var propertyEntity = _mapper.Map<PropertyEntity>(property);
             propertyEntity.Owner = _mapper.Map<OwnerEntity>(property.Owner);
 
-            _db.Property.Update(propertyEntity);
+            db.Property.Update(propertyEntity);
 
             if (propertyEntity.Image != null)
-                _db.Entry(propertyEntity.Image).Property(i => i.FileName).IsModified = false;
+                db.Entry(propertyEntity.Image).Property(i => i.FileName).IsModified = false;
 
-            _db.SaveChanges();
+            db.SaveChanges();
         }
 
         public void UpdateProperty(Property property)
         {
-            var propertyEntity = _db.Property.Find(property.PropertyId);
+            using var db = _dbContextFactory.CreateDbContext();
+
+            var propertyEntity = db.Property.Find(property.PropertyId);
             _mapper.Map(property, propertyEntity);
 
             if (property.Owner.OwnerId == propertyEntity.Owner.OwnerId)
@@ -137,29 +169,35 @@ namespace PropertyManagementService
                 propertyEntity.Owner = _mapper.Map<OwnerEntity>(property.Owner);
 
             if (propertyEntity.Image != null)
-                _db.Entry(propertyEntity.Image).Property(i => i.FileName).IsModified = false;
+                db.Entry(propertyEntity.Image).Property(i => i.FileName).IsModified = false;
 
-            _db.SaveChanges();
+            db.SaveChanges();
         }
 
         public Tenancy GetTenancy(int tenancyId)
         {
-            return _mapper.Map<Tenancy>(_db.Tenancy.Find(tenancyId));
+            using var db = _dbContextFactory.CreateDbContext();
+
+            return _mapper.Map<Tenancy>(db.Tenancy.Find(tenancyId));
         }
 
         public void AddTenancy(Tenancy tenancy)
         {
+            using var db = _dbContextFactory.CreateDbContext();
+
             var tenancyEntity = _mapper.Map<TenancyEntity>(tenancy);
             tenancyEntity.Agent = _mapper.Map<AgentEntity>(tenancy.Agent);
 
-            _db.Property.Find(tenancy.PropertyId)
+            db.Property.Find(tenancy.PropertyId)
                 .Tenancies.Add(tenancyEntity);
-            _db.SaveChanges();
+            db.SaveChanges();
         }
 
         public void UpdateTenancy(Tenancy tenancy)
         {
-            var tenancyEntity = _db.Tenancy.Find(tenancy.TenancyId);
+            using var db = _dbContextFactory.CreateDbContext();
+
+            var tenancyEntity = db.Tenancy.Find(tenancy.TenancyId);
             _mapper.Map(tenancy, tenancyEntity);
 
             if (tenancy.Agent.AgentId == tenancyEntity.AgentId)
@@ -167,32 +205,40 @@ namespace PropertyManagementService
             else
                 tenancyEntity.Agent = _mapper.Map<AgentEntity>(tenancy.Agent);
             
-            _db.SaveChanges();
+            db.SaveChanges();
         }
 
         public void AddAccountEntry(int tenancyId, AccountEntry accountEntry)
         {
-            _db.Tenancy.Find(tenancyId)
+            using var db = _dbContextFactory.CreateDbContext();
+
+            db.Tenancy.Find(tenancyId)
                 .AccountEntries.Add(_mapper.Map<AccountEntryEntity>(accountEntry));
-            _db.SaveChanges();
+            db.SaveChanges();
         }
 
         public void AddScheduledPayments(IEnumerable<ScheduledPayment> scheduledPayments)
         {
-            _db.ScheduledPayment.AddRange(scheduledPayments.Select(p => _mapper.Map<ScheduledPaymentEntity>(p)));
+            using var db = _dbContextFactory.CreateDbContext();
+
+            db.ScheduledPayment.AddRange(scheduledPayments.Select(p => _mapper.Map<ScheduledPaymentEntity>(p)));
         }
 
         public void UpdateScheduledPayment(ScheduledPayment scheduledPayment)
         {
-            var scheduledPaymentEntity = _db.ScheduledPayment.Find(scheduledPayment.ScheduledPaymentId);
+            using var db = _dbContextFactory.CreateDbContext();
+
+            var scheduledPaymentEntity = db.ScheduledPayment.Find(scheduledPayment.ScheduledPaymentId);
             _mapper.Map(scheduledPayment, scheduledPaymentEntity);
-            _db.ScheduledPayment.Update(scheduledPaymentEntity);
-            _db.SaveChanges();
+            db.ScheduledPayment.Update(scheduledPaymentEntity);
+            db.SaveChanges();
         }
 
         public InsurancePolicy GetLatestInsurancePolicy(int propertyId)
         {
-            return _mapper.Map<InsurancePolicy>(_db.Insurance
+            using var db = _dbContextFactory.CreateDbContext();
+
+            return _mapper.Map<InsurancePolicy>(db.Insurance
                 .Where(i => i.PropertyId == propertyId && i.StartDate <= DateTime.Today)
                 .OrderByDescending(i => i.EndDate)
                 .FirstOrDefault());
@@ -200,14 +246,18 @@ namespace PropertyManagementService
 
         public void AddInsurancePolicy(InsurancePolicy insurancePolicy)
         {
-            _db.Property.Find(insurancePolicy.PropertyId)
+            using var db = _dbContextFactory.CreateDbContext();
+
+            db.Property.Find(insurancePolicy.PropertyId)
                 .InsurancePolicies.Add(_mapper.Map<InsurancePolicyEntity>(insurancePolicy));
-            _db.SaveChanges();
+            db.SaveChanges();
         }
 
         public ElectricalInspectionCertificate GetLatestElectricalInspectionCertificate(int propertyId)
         {
-            return _mapper.Map<ElectricalInspectionCertificate>(_db.ElectricalInspectionCertificate
+            using var db = _dbContextFactory.CreateDbContext();
+
+            return _mapper.Map<ElectricalInspectionCertificate>(db.ElectricalInspectionCertificate
                 .Where(c => c.PropertyId == propertyId && c.IssueDate <= DateTime.Today)
                 .OrderByDescending(c => c.ExpiryDate)
                 .FirstOrDefault());
@@ -215,14 +265,18 @@ namespace PropertyManagementService
 
         public void AddElectricalInspectionCertificate(int propertyId, ElectricalInspectionCertificate certificate)
         {
-            _db.Property.Find(propertyId)
+            using var db = _dbContextFactory.CreateDbContext();
+
+            db.Property.Find(propertyId)
                 .ElectricalInspectionCertificates.Add(_mapper.Map<ElectricalInspectionCertificateEntity>(certificate));
-            _db.SaveChanges();
+            db.SaveChanges();
         }
 
         public GasSafetyCertificate GetLatestGasSafetyCertificate(int propertyId)
         {
-            return _mapper.Map<GasSafetyCertificate>(_db.GasSafetyCertificate
+            using var db = _dbContextFactory.CreateDbContext();
+
+            return _mapper.Map<GasSafetyCertificate>(db.GasSafetyCertificate
                 .Where(c => c.PropertyId == propertyId && c.IssueDate <= DateTime.Today)
                 .OrderByDescending(c => c.ExpiryDate)
                 .FirstOrDefault());
@@ -230,42 +284,54 @@ namespace PropertyManagementService
 
         public void AddGasSafetyCertificate(int propertyId, GasSafetyCertificate certificate)
         {
-            _db.Property.Find(propertyId)
+            using var db = _dbContextFactory.CreateDbContext();
+
+            db.Property.Find(propertyId)
                 .GasSafetyCertificates.Add(_mapper.Map<GasSafetyCertificateEntity>(certificate));
-            _db.SaveChanges();
+            db.SaveChanges();
         }
 
         public void AddImprovement(int propertyId, Improvement improvement)
         {
-            _db.Property.Find(propertyId)
+            using var db = _dbContextFactory.CreateDbContext();
+
+            db.Property.Find(propertyId)
                 .Improvements.Add(_mapper.Map<ImprovementEntity>(improvement));
-            _db.SaveChanges();
+            db.SaveChanges();
         }
 
         public void UpdateImprovements(int propertyId, IEnumerable<Improvement> improvements)
         {
-            var propertyEntity = _db.Property.Find(propertyId);
+            using var db = _dbContextFactory.CreateDbContext();
+
+            var propertyEntity = db.Property.Find(propertyId);
             _mapper.Map(improvements, propertyEntity.Improvements);
-            _db.SaveChanges();
+            db.SaveChanges();
         }
 
         public void AddExpense(int propertyId, Expense expense)
         {
-            _db.Property.Find(propertyId)
+            using var db = _dbContextFactory.CreateDbContext();
+
+            db.Property.Find(propertyId)
                 .Expenses.Add(_mapper.Map<ExpenseEntity>(expense));
-            _db.SaveChanges();
+            db.SaveChanges();
         }
 
         public void UpdateExpenses(int propertyId, IEnumerable<Expense> expenses)
         {
-            var propertyEntity = _db.Property.Find(propertyId);
+            using var db = _dbContextFactory.CreateDbContext();
+
+            var propertyEntity = db.Property.Find(propertyId);
             _mapper.Map(expenses, propertyEntity.Expenses);
-            _db.SaveChanges();
+            db.SaveChanges();
         }
 
         public EnergyPerformanceCertificate GetLatestEnergyPerformanceCertificate(int propertyId)
         {
-            return _mapper.Map<EnergyPerformanceCertificate>(_db.EnergyPerformanceCertificate
+            using var db = _dbContextFactory.CreateDbContext();
+
+            return _mapper.Map<EnergyPerformanceCertificate>(db.EnergyPerformanceCertificate
                 .Where(c => c.PropertyId == propertyId && c.IssueDate <= DateTime.Today)
                 .OrderByDescending(c => c.ExpiryDate)
                 .FirstOrDefault());
@@ -273,14 +339,16 @@ namespace PropertyManagementService
 
         public void AddEnergyPerformanceCertificate(int propertyId, EnergyPerformanceCertificate certificate)
         {
-            _db.Property.Find(propertyId)
+            using var db = _dbContextFactory.CreateDbContext();
+
+            db.Property.Find(propertyId)
                 .EnergyPerformanceCertificates.Add(_mapper.Map<EnergyPerformanceCertificateEntity>(certificate));
-            _db.SaveChanges();
+            db.SaveChanges();
         }
 
         public void Dispose()
         {
-            _db.Dispose();
+            //db.Dispose();
         }
     }
 }

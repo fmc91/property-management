@@ -9,182 +9,193 @@ using PropertyManagementCommon;
 using PropertyManagementService;
 using PropertyManagementService.Model;
 using PropertyManagementUi.ViewModels;
+using Microsoft.Extensions.DependencyInjection;
+using System.Windows.Controls;
 
 namespace PropertyManagementUi
 {
     public class AppController
     {
-        private NavigationWindow _mainWindow;
+        public delegate void NavigationDelegate(Page page);
 
-        private ServiceProvider _serviceProvider;
+        //private MainWindow _mainWindow;
+
+        //private IServiceProvider _serviceProvider;
+
+        private PropertyService _propertyService;
+
+        private ImageService _imageService;
 
         private RateAssistant _rateAssistant;
 
         private IMapper _mapper;
 
-        public AppController(NavigationWindow mainWindow, ServiceProvider serviceProvider, RateAssistant rateAssistant, IMapper mapper)
+        public AppController(PropertyService propertyService, ImageService imageService, RateAssistant rateAssistant, IMapper mapper)
         {
-            _mainWindow = mainWindow;
-            _serviceProvider = serviceProvider;
-
+            //_mainWindow = mainWindow;
+            //_serviceProvider = serviceProvider;
+            _propertyService = propertyService;
+            _imageService = imageService;
             _rateAssistant = rateAssistant;
             _mapper = mapper;
         }
 
+        public NavigationDelegate Navigate { get; set; }
+
         public void IndexPage()
         {
-            using var propertyService = _serviceProvider.GetPropertyService();
+            //using var _propertyService = _serviceProvider.GetRequiredService<PropertyService>();
 
             var viewModel = new IndexViewModel
             {
-                Properties = _mapper.Map<ObservableCollection<PropertySummaryViewModel>>(propertyService.GetAllProperties())
+                Properties = _mapper.Map<ObservableCollection<PropertySummaryViewModel>>(_propertyService.GetAllProperties())
             };
 
-            _mainWindow.Navigate(new IndexPage(this, viewModel));
+            Navigate(new IndexPage(this, viewModel));
         }
 
         public void AddPropertyPage()
         {
-            using var propertyService = _serviceProvider.GetPropertyService();
+            //using var _propertyService = _serviceProvider.GetRequiredService<PropertyService>();
 
             var viewModel = new AddPropertyViewModel
             {
-                Owners = new ObservableCollection<Owner>(propertyService.GetAllOwners())
+                Owners = new ObservableCollection<Owner>(_propertyService.GetAllOwners())
             };
 
-            _mainWindow.Navigate(new AddPropertyPage(this, viewModel));
+            Navigate(new AddPropertyPage(this, viewModel));
         }
 
         public void PropertyDetailsPage(int propertyId)
         {
-            using var propertyService = _serviceProvider.GetPropertyService();
+            //using var _propertyService = _serviceProvider.GetRequiredService<PropertyService>();
 
-            using var imageService = _serviceProvider.GetImageService();
+            //using var _imageService = _serviceProvider.GetRequiredService<ImageService>();
 
-            var viewModel = _mapper.Map<PropertyDetailsViewModel>(propertyService.GetProperty(propertyId));
+            var viewModel = _mapper.Map<PropertyDetailsViewModel>(_propertyService.GetProperty(propertyId));
 
             if (viewModel.ImageId is int imageId)
-                viewModel.ImagePath = imageService.GetImagePath(imageId);
+                viewModel.ImagePath = _imageService.GetImagePath(imageId);
 
-            _mainWindow.Navigate(new PropertyDetailsPage(this, viewModel));
+            Navigate(new PropertyDetailsPage(this, viewModel));
         }
 
         public void AddTenancyPage(int propertyId)
         {
-            using var propertyService = _serviceProvider.GetPropertyService();
+            //using var _propertyService = _serviceProvider.GetRequiredService<PropertyService>();
 
             var viewModel = new AddTenancyViewModel
             {
                 PropertyId = propertyId,
-                Agents = new ObservableCollection<Agent>(propertyService.GetAllAgents())
+                Agents = new ObservableCollection<Agent>(_propertyService.GetAllAgents())
             };
 
-            _mainWindow.Navigate(new AddTenancyPage(this, viewModel));
+            Navigate(new AddTenancyPage(this, viewModel));
         }
 
         public void EditProperty(EditPropertyViewModel viewModel)
         {
-            using var propertyService = _serviceProvider.GetPropertyService();
+            //using var _propertyService = _serviceProvider.GetRequiredService<PropertyService>();
 
-            propertyService.UpdateProperty(_mapper.Map<Property>(viewModel));
+            _propertyService.UpdateProperty(_mapper.Map<Property>(viewModel));
 
             PropertyDetailsPage(viewModel.PropertyId);
         }
 
         public void AddPayment(int tenancyId, AccountEntry newPayment)
         {
-            using var propertyService = _serviceProvider.GetPropertyService();
+            //using var _propertyService = _serviceProvider.GetRequiredService<PropertyService>();
 
-            propertyService.AddAccountEntry(tenancyId, newPayment);
+            _propertyService.AddAccountEntry(tenancyId, newPayment);
         }
 
         public void EditTenancyPage(int propertyId)
         {
-            using var propertyService = _serviceProvider.GetPropertyService();
+            //using var _propertyService = _serviceProvider.GetRequiredService<PropertyService>();
 
-            var viewModel = _mapper.Map<EditTenancyViewModel>(propertyService.GetTenancy(propertyId));
-            viewModel.Agents = new ObservableCollection<Agent>(propertyService.GetAllAgents());
+            var viewModel = _mapper.Map<EditTenancyViewModel>(_propertyService.GetTenancy(propertyId));
+            viewModel.Agents = new ObservableCollection<Agent>(_propertyService.GetAllAgents());
 
-            _mainWindow.Navigate(new EditTenancyPage(this, viewModel));
+            Navigate(new EditTenancyPage(this, viewModel));
         }
 
         public void TenancyDetailsPage(int tenancyId)
         {
-            using var propertyService = _serviceProvider.GetPropertyService();
+            //using var _propertyService = _serviceProvider.GetRequiredService<PropertyService>();
 
-            var viewModel = _mapper.Map<TenancyDetailsViewModel>(propertyService.GetTenancy(tenancyId));
+            var viewModel = _mapper.Map<TenancyDetailsViewModel>(_propertyService.GetTenancy(tenancyId));
 
-            _mainWindow.Navigate(new TenancyDetailsPage(this, viewModel));
+            Navigate(new TenancyDetailsPage(this, viewModel));
         }
 
         public void AddProperty(AddPropertyViewModel viewModel)
         {
-            using var propertyService = _serviceProvider.GetPropertyService();
+            //using var _propertyService = _serviceProvider.GetRequiredService<PropertyService>();
 
-            propertyService.AddProperty(_mapper.Map<Property>(viewModel));
+            _propertyService.AddProperty(_mapper.Map<Property>(viewModel));
 
             IndexPage();
         }
 
         public void AddImage(string sourcePath, AddPropertyViewModel viewModel)
         {
-            using var imageService = _serviceProvider.GetImageService();
+            //using var _imageService = _serviceProvider.GetRequiredService<ImageService>();
 
             if (viewModel.ImageId is int oldImageId)
             {
                 viewModel.ImagePath = null;
-                imageService.DeleteImage(oldImageId);
+                _imageService.DeleteImage(oldImageId);
             }
 
-            int imageId = imageService.SaveImage(sourcePath);
+            int imageId = _imageService.SaveImage(sourcePath);
 
             viewModel.ImageId = imageId;
-            viewModel.ImagePath = imageService.GetImagePath(imageId);
+            viewModel.ImagePath = _imageService.GetImagePath(imageId);
         }
 
         public void ClearImage(AddPropertyViewModel viewModel)
         {
             if (viewModel.ImageId is not int imageId) return;
 
-            using var imageService = _serviceProvider.GetImageService();
+            //using var _imageService = _serviceProvider.GetRequiredService<ImageService>();
             
             viewModel.ImagePath = null;
             viewModel.ImageId = null;
-            imageService.DeleteImage(imageId);
+            _imageService.DeleteImage(imageId);
         }
 
         public void AddImage(string sourcePath, EditPropertyViewModel viewModel)
         {
-            using var imageService = _serviceProvider.GetImageService();
+            //using var _imageService = _serviceProvider.GetRequiredService<ImageService>();
 
             if (viewModel.ImageId is int oldImageId)
             {
                 viewModel.ImagePath = null;
-                imageService.DeleteImage(oldImageId);
+                _imageService.DeleteImage(oldImageId);
             }
 
-            int imageId = imageService.SaveImage(sourcePath);
+            int imageId = _imageService.SaveImage(sourcePath);
 
             viewModel.ImageId = imageId;
-            viewModel.ImagePath = imageService.GetImagePath(imageId);
+            viewModel.ImagePath = _imageService.GetImagePath(imageId);
         }
 
         public void ClearImage(EditPropertyViewModel viewModel)
         {
             if (viewModel.ImageId is not int imageId) return;
 
-            using var imageService = _serviceProvider.GetImageService();
+            //using var _imageService = _serviceProvider.GetRequiredService<ImageService>();
 
             viewModel.ImagePath = null;
             viewModel.ImageId = null;
-            imageService.DeleteImage(imageId);
+            _imageService.DeleteImage(imageId);
         }
 
         public void UpdateTenancy(EditTenancyViewModel editTenancyViewModel)
         {
-            using var propertyService = _serviceProvider.GetPropertyService();
+            //using var _propertyService = _serviceProvider.GetRequiredService<PropertyService>();
 
-            var tenancy = propertyService.GetTenancy(editTenancyViewModel.TenancyId);
+            var tenancy = _propertyService.GetTenancy(editTenancyViewModel.TenancyId);
 
             var oldRates = tenancy.Rates;
             var newRates = editTenancyViewModel.Rates;
@@ -200,14 +211,14 @@ namespace PropertyManagementUi
                     _rateAssistant.CreateScheduledPaymentsAfterDate(tenancy, DateTime.Today));
             }
 
-            propertyService.UpdateTenancy(tenancy);
+            _propertyService.UpdateTenancy(tenancy);
 
             TenancyDetailsPage(editTenancyViewModel.TenancyId);
         }
 
         public void AddTenancy(AddTenancyViewModel viewModel)
         {
-            using var propertyService = _serviceProvider.GetPropertyService();
+            //using var _propertyService = _serviceProvider.GetRequiredService<PropertyService>();
 
             var tenancy = _mapper.Map<Tenancy>(viewModel);
 
@@ -222,170 +233,170 @@ namespace PropertyManagementUi
             tenancy.ScheduledPayments.AddRange(
                 _rateAssistant.CreateScheduledPayments(tenancy));
 
-            propertyService.AddTenancy(tenancy);
+            _propertyService.AddTenancy(tenancy);
 
             PropertyDetailsPage(viewModel.PropertyId);
         }
 
         public IEnumerable<Insurer> GetAllInsurers()
         {
-            using var propertyService = _serviceProvider.GetPropertyService();
+            //using var _propertyService = _serviceProvider.GetRequiredService<PropertyService>();
 
-            return propertyService.GetAllInsurers();
+            return _propertyService.GetAllInsurers();
         }
 
         public void AddAgent(Agent agent)
         {
-            using var propertyService = _serviceProvider.GetPropertyService();
+            //using var _propertyService = _serviceProvider.GetRequiredService<PropertyService>();
 
-            propertyService.AddAgent(agent);
+            _propertyService.AddAgent(agent);
         }
 
         public IEnumerable<Broker> GetAllBrokers()
         {
-            using var propertyService = _serviceProvider.GetPropertyService();
+            //using var _propertyService = _serviceProvider.GetRequiredService<PropertyService>();
 
-            return propertyService.GetAllBrokers();
+            return _propertyService.GetAllBrokers();
         }
 
         public void AddOwner(Owner owner)
         {
-            using var propertyService = _serviceProvider.GetPropertyService();
+            //using var _propertyService = _serviceProvider.GetRequiredService<PropertyService>();
 
-            propertyService.AddOwner(_mapper.Map<Owner>(owner));
+            _propertyService.AddOwner(_mapper.Map<Owner>(owner));
         }
 
         public IEnumerable<Owner> GetAllOwners()
         {
-            using var propertyService = _serviceProvider.GetPropertyService();
+            //using var _propertyService = _serviceProvider.GetRequiredService<PropertyService>();
 
-            return propertyService.GetAllOwners();
+            return _propertyService.GetAllOwners();
         }
 
         public void AddInsurer(Insurer insurer)
         {
-            using var propertyService = _serviceProvider.GetPropertyService();
+            //using var _propertyService = _serviceProvider.GetRequiredService<PropertyService>();
 
-            propertyService.AddInsurer(insurer);
+            _propertyService.AddInsurer(insurer);
         }
 
         public void AddBroker(Broker broker)
         {
-            using var propertyService = _serviceProvider.GetPropertyService();
+            //using var _propertyService = _serviceProvider.GetRequiredService<PropertyService>();
 
-            propertyService.AddBroker(broker);
+            _propertyService.AddBroker(broker);
         }
 
         public NewInsurancePolicyViewModel GetNewInsurancePolicyViewModel(int propertyId)
         {
-            using var propertyService = _serviceProvider.GetPropertyService();
+            //using var _propertyService = _serviceProvider.GetRequiredService<PropertyService>();
 
             return new NewInsurancePolicyViewModel
             {
                 PropertyId = propertyId,
-                Brokers = propertyService.GetAllBrokers(),
-                Insurers = propertyService.GetAllInsurers()
+                Brokers = _propertyService.GetAllBrokers(),
+                Insurers = _propertyService.GetAllInsurers()
             };
         }
 
         public void AddInsurancePolicy(NewInsurancePolicyViewModel viewModel)
         {
-            using var propertyService = _serviceProvider.GetPropertyService();
+            //using var _propertyService = _serviceProvider.GetRequiredService<PropertyService>();
 
-            propertyService.AddInsurancePolicy(_mapper.Map<InsurancePolicy>(viewModel));
+            _propertyService.AddInsurancePolicy(_mapper.Map<InsurancePolicy>(viewModel));
         }
 
         public InsurancePolicy GetLatestInsurancePolicy(int propertyId)
         {
-            using var propertyService = _serviceProvider.GetPropertyService();
+            //using var _propertyService = _serviceProvider.GetRequiredService<PropertyService>();
 
-            return propertyService.GetLatestInsurancePolicy(propertyId);
+            return _propertyService.GetLatestInsurancePolicy(propertyId);
         }
 
         public void AddElectricalInspectionCertificate(int propertyId, ElectricalInspectionCertificate certificate)
         {
-            using var propertyService = _serviceProvider.GetPropertyService();
+            //using var _propertyService = _serviceProvider.GetRequiredService<PropertyService>();
 
-            propertyService.AddElectricalInspectionCertificate(propertyId, certificate);
+            _propertyService.AddElectricalInspectionCertificate(propertyId, certificate);
         }
 
         public void EditPropertyPage(int propertyId)
         {
-            using var propertyService = _serviceProvider.GetPropertyService();
-            using var imageService = _serviceProvider.GetImageService();
+            //using var _propertyService = _serviceProvider.GetRequiredService<PropertyService>();
+            //using var _imageService = _serviceProvider.GetRequiredService<ImageService>();
 
-            var property = propertyService.GetProperty(propertyId);
+            var property = _propertyService.GetProperty(propertyId);
 
             var viewModel = _mapper.Map<EditPropertyViewModel>(property);
-            viewModel.Owners = new ObservableCollection<Owner>(propertyService.GetAllOwners());
+            viewModel.Owners = new ObservableCollection<Owner>(_propertyService.GetAllOwners());
 
             if (viewModel.ImageId is int imageId)
-                viewModel.ImagePath = imageService.GetImagePath(imageId);
+                viewModel.ImagePath = _imageService.GetImagePath(imageId);
 
-            _mainWindow.Navigate(new EditPropertyPage(this, viewModel));
+            Navigate(new EditPropertyPage(this, viewModel));
         }
 
         public ElectricalInspectionCertificate GetLatestElectricalInspectionCertificate(int propertyId)
         {
-            using var propertyService = _serviceProvider.GetPropertyService();
+            //using var _propertyService = _serviceProvider.GetRequiredService<PropertyService>();
             
-            return propertyService.GetLatestElectricalInspectionCertificate(propertyId);
+            return _propertyService.GetLatestElectricalInspectionCertificate(propertyId);
         }
 
         public void AddGasSafetyCertificate(int propertyId, GasSafetyCertificate certificate)
         {
-            using var propertyService = _serviceProvider.GetPropertyService();
+            //using var _propertyService = _serviceProvider.GetRequiredService<PropertyService>();
 
-            propertyService.AddGasSafetyCertificate(propertyId, certificate);
+            _propertyService.AddGasSafetyCertificate(propertyId, certificate);
         }
 
         public GasSafetyCertificate GetLatestGasSafetyCertificate(int propertyId)
         {
-            using var propertyService = _serviceProvider.GetPropertyService();
+            //using var _propertyService = _serviceProvider.GetRequiredService<PropertyService>();
             
-            return propertyService.GetLatestGasSafetyCertificate(propertyId);
+            return _propertyService.GetLatestGasSafetyCertificate(propertyId);
         }
 
         public void AddEnergyPerformanceCertificate(int propertyId, EnergyPerformanceCertificate certificate)
         {
-            using var propertyService = _serviceProvider.GetPropertyService();
+            //using var _propertyService = _serviceProvider.GetRequiredService<PropertyService>();
 
-            propertyService.AddEnergyPerformanceCertificate(propertyId, certificate);
+            _propertyService.AddEnergyPerformanceCertificate(propertyId, certificate);
         }
 
         public EnergyPerformanceCertificate GetLatestEnergyPerformanceCertificate(int propertyId)
         {
-            using var propertyService = _serviceProvider.GetPropertyService();
+            //using var _propertyService = _serviceProvider.GetRequiredService<PropertyService>();
 
-            return propertyService.GetLatestEnergyPerformanceCertificate(propertyId);
+            return _propertyService.GetLatestEnergyPerformanceCertificate(propertyId);
         }
 
         public void AddExpense(int propertyId, Expense expense)
         {
-            using var propertyService = _serviceProvider.GetPropertyService();
+            //using var _propertyService = _serviceProvider.GetRequiredService<PropertyService>();
 
-            propertyService.AddExpense(propertyId, expense);
+            _propertyService.AddExpense(propertyId, expense);
         }
 
         public void AddImprovement(int propertyId, Improvement improvement)
         {
-            using var propertyService = _serviceProvider.GetPropertyService();
+            //using var _propertyService = _serviceProvider.GetRequiredService<PropertyService>();
 
-            propertyService.AddImprovement(propertyId, improvement);
+            _propertyService.AddImprovement(propertyId, improvement);
         }
 
         public void UpdateImprovements(int propertyId, IEnumerable<Improvement> improvements)
         {
-            using var propertyService = _serviceProvider.GetPropertyService();
+            //using var _propertyService = _serviceProvider.GetRequiredService<PropertyService>();
 
-            propertyService.UpdateImprovements(propertyId, improvements);
+            _propertyService.UpdateImprovements(propertyId, improvements);
         }
 
         public void UpdateExpenses(int propertyId, IEnumerable<Expense> expenses)
         {
-            using var propertyService = _serviceProvider.GetPropertyService();
+            //using var _propertyService = _serviceProvider.GetRequiredService<PropertyService>();
 
-            propertyService.UpdateExpenses(propertyId, expenses);
+            _propertyService.UpdateExpenses(propertyId, expenses);
         }
     }
 }

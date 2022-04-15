@@ -9,6 +9,7 @@ using PropertyManagementService;
 using PropertyManagementService.Model;
 using PropertyManagementUi.Profiles;
 using PropertyManagementUi.ViewModels;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace PropertyManagementUi
 {
@@ -17,26 +18,35 @@ namespace PropertyManagementUi
     /// </summary>
     public partial class App : Application
     {
+        private readonly AppController _appController;
+
+        public App()
+        {
+            //ONLY EXISTS SO THE AUTO-GENERATED MAIN METHOD (NOT USED) DOES NOT CAUSE A COMPILE-TIME ERROR
+            throw new NotImplementedException();
+        }
+
+        public App(AppController appController)
+        {
+            _appController = appController;
+            InitializeComponent();
+        }
+
         private void ApplicationStartup(object sender, StartupEventArgs e)
         {
-            var window = new NavigationWindow
+            var window = new MainWindow
             {
                 Width = 1300,
                 Height = 800,
                 MinWidth = 650,
-                MinHeight = 400,
-                ShowsNavigationUI = false
+                MinHeight = 400
             };
-
-            window.Navigated += (s, e) => window.NavigationService.RemoveBackEntry();
 
             window.Show();
 
-            var serviceProvider = AppBootstrap.GetServiceProvider();
+            _appController.Navigate = page => window.Navigate(page);
 
-            var appController = new AppController(window, serviceProvider, new RateAssistant(), new Mapper(AppBootstrap.CreateMapperConfig()));
-
-            appController.IndexPage();
+            _appController.IndexPage();
         }
     }
 }

@@ -19,14 +19,14 @@ namespace PropertyManagementUi
             _mapperConfig = mapperConfig;
         }
 
-        public PropertyService GetPropertyService()
-        {
-            return new PropertyService(new PropertyManagementContext(_dbContextOptions), new Mapper(_mapperConfig));
-        }
+        //public PropertyService GetPropertyService()
+        //{
+        //    return new PropertyService(new PropertyManagementContext(_dbContextOptions), new Mapper(_mapperConfig));
+        //}
 
-        public ImageService GetImageService()
-        {
-            return new ImageService(new PropertyManagementContext(_dbContextOptions), Path.Combine(Directory.GetCurrentDirectory(), "property-img"));
-        }
+        //public ImageService GetImageService()
+        //{
+        //    return new ImageService(new PropertyManagementContext(_dbContextOptions));
+        //}
     }
 }

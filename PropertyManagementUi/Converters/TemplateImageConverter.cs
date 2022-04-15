@@ -22,8 +22,6 @@ namespace PropertyManagementUi
             image.EndInit();
 
             return image;
-
-            //return BitmapFrame.Create(new Uri(path), BitmapCreateOptions.None, BitmapCacheOption.OnLoad);
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
