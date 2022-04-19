@@ -2,6 +2,7 @@ bin/
 obj/
 .vs/
 Migrations/
+property-img/
 *.db
 *.db-shm
 *.db-wal

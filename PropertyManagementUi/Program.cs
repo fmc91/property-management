@@ -12,8 +12,11 @@ using PropertyManagementUi.Profiles;
 using PropertyManagementUi.ViewModels;
 using PropertyManagementData;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using PropertyManagementService;
+using PropertyManagementCommon;
 using Entities = PropertyManagementData.Model;
+using IConfigurationProvider = AutoMapper.IConfigurationProvider;
 
 namespace PropertyManagementUi
 {
@@ -31,7 +34,7 @@ namespace PropertyManagementUi
         private static IHostBuilder CreateHostBuilder()
         {
             return Host.CreateDefaultBuilder()
-                .ConfigureServices(services =>
+                .ConfigureServices((context, services) =>
                 {
                     services.AddSingleton<App>()
                         .AddSingleton<AppController>()
@@ -43,8 +46,10 @@ namespace PropertyManagementUi
                         .AddDbContextFactory<PropertyManagementContext>(builder =>
                         {
                             builder.UseLazyLoadingProxies()
-                                .UseSqlite(@"Data Source=C:\Users\fazal\source\repos\PropertyManagementSystem\PropertyManagementData\PropertyManagement.db");
+                                .UseSqlite(context.Configuration.GetConnectionString("PropertyDatabase"));
                         });
+
+                    services.Configure<StorageOptions>(context.Configuration.GetSection(StorageOptions.SectionName));
                 });
         }
 
