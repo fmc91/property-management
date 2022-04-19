@@ -10,11 +10,11 @@ using PropertyManagementData.Model;
 
 namespace PropertyManagementService
 {
-    public class ImageService : IDisposable
+    public class ImageService
     {
-        private IDbContextFactory<PropertyManagementContext> _dbContextFactory;
+        private readonly IDbContextFactory<PropertyManagementContext> _dbContextFactory;
 
-        private string _saveDirectoryPath = Path.Combine(Directory.GetCurrentDirectory(), "property-img");
+        private readonly string _saveDirectoryPath = Path.Combine(Directory.GetCurrentDirectory(), "property-img");
 
         public ImageService(IDbContextFactory<PropertyManagementContext> dbContextFactory)
         {
@@ -64,11 +64,6 @@ namespace PropertyManagementService
 
             db.Image.Remove(image);
             db.SaveChanges();
-        }
-
-        public void Dispose()
-        {
-            //db.Dispose();
         }
     }
 }

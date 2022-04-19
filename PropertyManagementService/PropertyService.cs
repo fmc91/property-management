@@ -23,11 +23,11 @@ using AccountEntryEntity = PropertyManagementData.Model.AccountEntry;
 
 namespace PropertyManagementService
 {
-    public class PropertyService : IDisposable
+    public class PropertyService
     {
-        private IDbContextFactory<PropertyManagementContext> _dbContextFactory;
+        private readonly IDbContextFactory<PropertyManagementContext> _dbContextFactory;
 
-        private IMapper _mapper;
+        private readonly IMapper _mapper;
 
         public PropertyService(IDbContextFactory<PropertyManagementContext> dbContextFactory, IMapper mapper)
         {
@@ -344,11 +344,6 @@ namespace PropertyManagementService
             db.Property.Find(propertyId)
                 .EnergyPerformanceCertificates.Add(_mapper.Map<EnergyPerformanceCertificateEntity>(certificate));
             db.SaveChanges();
-        }
-
-        public void Dispose()
-        {
-            //db.Dispose();
         }
     }
 }
