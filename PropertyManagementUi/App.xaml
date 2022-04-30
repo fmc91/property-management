@@ -5,7 +5,8 @@
              xmlns:collections="clr-namespace:System.Collections;assembly=mscorlib"
              xmlns:common="clr-namespace:PropertyManagementCommon;assembly=PropertyManagementCommon"
              xmlns:system="clr-namespace:System;assembly=mscorlib"
-             Startup="ApplicationStartup">
+             Startup="OnStartup"
+             Exit="OnExit">
     
     <Application.Resources>
 

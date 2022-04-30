@@ -7,7 +7,7 @@ using PropertyManagementService.Model;
 
 namespace PropertyManagementService
 {
-    public class RateAssistant
+    public class PaymentService
     {
         public IEnumerable<ScheduledPayment> CreateScheduledPayments(Tenancy tenancy)
         {
@@ -15,7 +15,8 @@ namespace PropertyManagementService
             {
                 PaymentFrequency.Weekly => d => d.AddDays(7),
                 PaymentFrequency.Monthly => d => d.AddMonths(1),
-                PaymentFrequency.Quarterly => d => d.AddMonths(4)
+                PaymentFrequency.Quarterly => d => d.AddMonths(4),
+                _ => throw new NotImplementedException()
             };
 
             var result = new List<ScheduledPayment>();
@@ -49,7 +50,8 @@ namespace PropertyManagementService
             {
                 PaymentFrequency.Weekly => d => d.AddDays(7),
                 PaymentFrequency.Monthly => d => d.AddMonths(1),
-                PaymentFrequency.Quarterly => d => d.AddMonths(4)
+                PaymentFrequency.Quarterly => d => d.AddMonths(4),
+                _ => throw new NotImplementedException()
             };
 
             var result = new List<ScheduledPayment>();
@@ -94,7 +96,7 @@ namespace PropertyManagementService
             return true;
         }
 
-        public bool HaveRatesChanged(IList<Rate> oldRates, IList<Rate> newRates)
+        public bool AreRatesDifferent(IList<Rate> oldRates, IList<Rate> newRates)
         {
             if (oldRates.Count != newRates.Count) return true;
 

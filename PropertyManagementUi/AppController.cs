@@ -14,27 +14,29 @@ using System.Windows.Controls;
 
 namespace PropertyManagementUi
 {
+    public delegate bool NavigationDelegate(Page page);
+
     public class AppController
     {
-        public delegate void NavigationDelegate(Page page);
-
         private readonly PropertyService _propertyService;
 
         private readonly ImageService _imageService;
 
-        private readonly RateAssistant _rateAssistant;
+        private readonly PaymentService _paymentService;
 
         private readonly IMapper _mapper;
 
-        public AppController(PropertyService propertyService, ImageService imageService, RateAssistant rateAssistant, IMapper mapper)
+        private readonly NavigationDelegate _navigate;
+
+        public AppController(
+            PropertyService propertyService, ImageService imageService, PaymentService paymentService, IMapper mapper, NavigationDelegate navigate)
         {
             _propertyService = propertyService;
             _imageService = imageService;
-            _rateAssistant = rateAssistant;
+            _paymentService = paymentService;
             _mapper = mapper;
+            _navigate = navigate;
         }
-
-        public NavigationDelegate Navigate { get; set; }
 
         public void IndexPage()
         {
@@ -43,7 +45,7 @@ namespace PropertyManagementUi
                 Properties = _mapper.Map<ObservableCollection<PropertySummaryViewModel>>(_propertyService.GetAllProperties())
             };
 
-            Navigate(new IndexPage(this, viewModel));
+            _navigate(new IndexPage(this, viewModel));
         }
 
         public void AddPropertyPage()
@@ -53,7 +55,7 @@ namespace PropertyManagementUi
                 Owners = new ObservableCollection<Owner>(_propertyService.GetAllOwners())
             };
 
-            Navigate(new AddPropertyPage(this, viewModel));
+            _navigate(new AddPropertyPage(this, viewModel));
         }
 
         public void PropertyDetailsPage(int propertyId)
@@ -63,7 +65,7 @@ namespace PropertyManagementUi
             if (viewModel.ImageId is int imageId)
                 viewModel.ImagePath = _imageService.GetImagePath(imageId);
 
-            Navigate(new PropertyDetailsPage(this, viewModel));
+            _navigate(new PropertyDetailsPage(this, viewModel));
         }
 
         public void AddTenancyPage(int propertyId)
@@ -74,7 +76,7 @@ namespace PropertyManagementUi
                 Agents = new ObservableCollection<Agent>(_propertyService.GetAllAgents())
             };
 
-            Navigate(new AddTenancyPage(this, viewModel));
+            _navigate(new AddTenancyPage(this, viewModel));
         }
 
         public void EditProperty(EditPropertyViewModel viewModel)
@@ -94,14 +96,14 @@ namespace PropertyManagementUi
             var viewModel = _mapper.Map<EditTenancyViewModel>(_propertyService.GetTenancy(propertyId));
             viewModel.Agents = new ObservableCollection<Agent>(_propertyService.GetAllAgents());
 
-            Navigate(new EditTenancyPage(this, viewModel));
+            _navigate(new EditTenancyPage(this, viewModel));
         }
 
         public void TenancyDetailsPage(int tenancyId)
         {
             var viewModel = _mapper.Map<TenancyDetailsViewModel>(_propertyService.GetTenancy(tenancyId));
 
-            Navigate(new TenancyDetailsPage(this, viewModel));
+            _navigate(new TenancyDetailsPage(this, viewModel));
         }
 
         public void AddProperty(AddPropertyViewModel viewModel)
@@ -164,15 +166,13 @@ namespace PropertyManagementUi
             var oldRates = tenancy.Rates;
             var newRates = editTenancyViewModel.Rates;
 
-            bool haveRatesChanged = _rateAssistant.HaveRatesChanged(oldRates, newRates);
-
             _mapper.Map(editTenancyViewModel, tenancy);
 
-            if (haveRatesChanged)
+            if (_paymentService.AreRatesDifferent(oldRates, newRates))
             {
                 tenancy.ScheduledPayments.RemoveAll(p => p.Date >= DateTime.Today);
                 tenancy.ScheduledPayments.AddRange(
-                    _rateAssistant.CreateScheduledPaymentsAfterDate(tenancy, DateTime.Today));
+                    _paymentService.CreateScheduledPaymentsAfterDate(tenancy, DateTime.Today));
             }
 
             _propertyService.UpdateTenancy(tenancy);
@@ -193,7 +193,7 @@ namespace PropertyManagementUi
             });
 
             tenancy.ScheduledPayments.AddRange(
-                _rateAssistant.CreateScheduledPayments(tenancy));
+                _paymentService.CreateScheduledPayments(tenancy));
 
             _propertyService.AddTenancy(tenancy);
 
@@ -270,7 +270,7 @@ namespace PropertyManagementUi
             if (viewModel.ImageId is int imageId)
                 viewModel.ImagePath = _imageService.GetImagePath(imageId);
 
-            Navigate(new EditPropertyPage(this, viewModel));
+            _navigate(new EditPropertyPage(this, viewModel));
         }
 
         public ElectricalInspectionCertificate GetLatestElectricalInspectionCertificate(int propertyId)

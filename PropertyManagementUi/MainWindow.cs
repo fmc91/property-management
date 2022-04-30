@@ -13,6 +13,11 @@ namespace PropertyManagementUi
         {
             ShowsNavigationUI = false;
             Navigated += (s, e) => NavigationService.RemoveBackEntry();
+
+            Width = 1300;
+            Height = 800;
+            MinWidth = 650;
+            MinHeight = 400;
         }
     }
 }

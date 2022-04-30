@@ -61,6 +61,7 @@ namespace PropertyManagementUi
 
         private void SaveButtonClick(object sender, RoutedEventArgs e)
         {
+            //NEED TO CHANGE VALIDATION
             if (ViewModel.Agent == null || ViewModel.Tenants.Any(t => String.IsNullOrWhiteSpace(t.Name) || String.IsNullOrWhiteSpace(t.Telephone)))
                 return;
 

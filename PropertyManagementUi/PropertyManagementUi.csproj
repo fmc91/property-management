@@ -5,7 +5,7 @@
     <TargetFramework>net6.0-windows</TargetFramework>
     <UseWPF>true</UseWPF>
     <Nullable>disable</Nullable>
-    <StartupObject>PropertyManagementUi.Program</StartupObject>
+    <StartupObject>PropertyManagementUi.App</StartupObject>
   </PropertyGroup>
 
   <ItemGroup>
