@@ -23,7 +23,7 @@ namespace PropertyManagementUi
     /// </summary>
     public partial class AddTenancyPage : Page, INotifyPropertyChanged
     {
-        private AppController _appController;
+        private readonly AppController _appController;
 
         private bool _addingAgent;
 

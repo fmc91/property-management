@@ -25,9 +25,9 @@ namespace PropertyManagementUi
     /// </summary>
     public partial class AddPropertyPage : Page, INotifyPropertyChanged
     {
-        private bool _addingOwner;
+        private readonly AppController _appController;
 
-        private AppController _appController;
+        private bool _addingOwner;
 
         public AddPropertyPage(AppController appController, AddPropertyViewModel viewModel)
         {

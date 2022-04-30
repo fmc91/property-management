@@ -23,7 +23,8 @@ namespace PropertyManagementUi
     /// </summary>
     public partial class TenancyDetailsPage : Page, INotifyPropertyChanged
     {
-        private AppController _appController;
+        private readonly AppController _appController;
+
         private bool _addingPayment;
 
         public event PropertyChangedEventHandler PropertyChanged;

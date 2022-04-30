@@ -20,7 +20,7 @@ namespace PropertyManagementUi
     /// </summary>
     public partial class IndexPage : Page
     {
-        private AppController _appController;
+        private readonly AppController _appController;
 
         public IndexPage(AppController appController, IndexViewModel viewModel)
         {

@@ -16,7 +16,7 @@ namespace PropertyManagementUi
     /// </summary>
     public partial class PropertyDetailsPage : Page, INotifyPropertyChanged
     {
-        private AppController _appController;
+        private readonly AppController _appController;
 
         private bool _addingInsurance;
 
