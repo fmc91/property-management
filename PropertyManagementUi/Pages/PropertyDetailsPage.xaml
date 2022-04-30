@@ -5,6 +5,7 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:PropertyManagementUi"
       xmlns:sys="clr-namespace:System;assembly=mscorlib"
+      xmlns:scm="clr-namespace:System.ComponentModel;assembly=WindowsBase"
       mc:Ignorable="d" 
       d:DesignHeight="800" d:DesignWidth="1300"
       WindowTitle="Property Details">
@@ -682,7 +683,9 @@
                                     <TextBlock FontSize="18" Text="Expenses" VerticalAlignment="Center" Margin="0 0 6 0"/>
                                 </DockPanel>
 
-                                <Grid Grid.Row="1" Margin="0 0 0 2" Visibility="{Binding EditingExpenses, RelativeSource={RelativeSource AncestorType=Page}, Converter={StaticResource VisibleIfFalse}}">
+                                <Grid Grid.Row="1" Margin="0 0 0 2"
+                                      Visibility="{Binding EditingExpenses, RelativeSource={RelativeSource AncestorType=Page}, Converter={StaticResource VisibleIfFalse}}"
+                                      Width="{Binding ElementName=ExpensesStackPanel, Path=ActualWidth}" HorizontalAlignment="Left">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="3*"/>
                                         <ColumnDefinition Width="10*"/>
@@ -694,7 +697,9 @@
                                     <TextBlock Grid.Column="2" FontWeight="Bold" Text="Amount"/>
                                 </Grid>
 
-                                <Grid Grid.Row="1" Margin="0 0 0 2" Visibility="{Binding EditingExpenses, RelativeSource={RelativeSource AncestorType=Page}, Converter={StaticResource VisibleIfTrue}}">
+                                <Grid Grid.Row="1" Margin="0 0 0 2"
+                                      Visibility="{Binding EditingExpenses, RelativeSource={RelativeSource AncestorType=Page}, Converter={StaticResource VisibleIfTrue}}"
+                                      Width="{Binding ElementName=ExpensesStackPanel, Path=ActualWidth}" HorizontalAlignment="Left">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="3*"/>
                                         <ColumnDefinition Width="10*"/>
@@ -708,7 +713,16 @@
                                 </Grid>
 
                                 <ScrollViewer Grid.Row="2" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
-                                    <StackPanel>
+                                    <StackPanel x:Name="ExpensesStackPanel">
+
+                                        <StackPanel.Resources>
+                                            <CollectionViewSource x:Key="ExpensesViewSource" Source="{Binding Expenses}">
+                                                <CollectionViewSource.SortDescriptions>
+                                                    <scm:SortDescription PropertyName="Date" Direction="Ascending"/>
+                                                </CollectionViewSource.SortDescriptions>
+                                            </CollectionViewSource>
+                                        </StackPanel.Resources>
+                                        
                                         <Grid Margin="0 0 0 2" Visibility="{Binding AddingExpense, RelativeSource={RelativeSource AncestorType=Page}, Converter={StaticResource VisibleIfTrue}}"
                                               DataContext="{Binding NewExpense}">
                                             <Grid.ColumnDefinitions>
@@ -722,7 +736,7 @@
                                             <TextBox Grid.Column="2" Name="newExpenseAmountTextBox" Text="{Binding Amount, Mode=TwoWay}"/>
                                         </Grid>
 
-                                        <ItemsControl ItemsSource="{Binding Expenses}" Visibility="{Binding EditingExpenses, RelativeSource={RelativeSource AncestorType=Page}, Converter={StaticResource VisibleIfFalse}}">
+                                        <ItemsControl ItemsSource="{Binding Source={StaticResource ExpensesViewSource}}" Visibility="{Binding EditingExpenses, RelativeSource={RelativeSource AncestorType=Page}, Converter={StaticResource VisibleIfFalse}}">
                                             <ItemsControl.ItemsPanel>
                                                 <ItemsPanelTemplate>
                                                     <StackPanel/>
@@ -828,7 +842,9 @@
                                     <TextBlock FontSize="18" Text="Improvements" VerticalAlignment="Center" Margin="0 0 6 0"/>
                                 </DockPanel>
 
-                                <Grid Grid.Row="1" Margin="0 0 0 2" Visibility="{Binding EditingImprovements, RelativeSource={RelativeSource AncestorType=Page}, Converter={StaticResource VisibleIfFalse}}">
+                                <Grid Grid.Row="1" Margin="0 0 0 2"
+                                      Visibility="{Binding EditingImprovements, RelativeSource={RelativeSource AncestorType=Page}, Converter={StaticResource VisibleIfFalse}}"
+                                      Width="{Binding ElementName=ImprovementsStackPanel, Path=ActualWidth}" HorizontalAlignment="Left">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="3*"/>
                                         <ColumnDefinition Width="10*"/>
@@ -840,7 +856,9 @@
                                     <TextBlock Grid.Column="2" FontWeight="Bold" Text="Cost"/>
                                 </Grid>
 
-                                <Grid Grid.Row="1" Margin="0 0 0 2" Visibility="{Binding EditingImprovements, RelativeSource={RelativeSource AncestorType=Page}, Converter={StaticResource VisibleIfTrue}}">
+                                <Grid Grid.Row="1" Margin="0 0 0 2"
+                                      Visibility="{Binding EditingImprovements, RelativeSource={RelativeSource AncestorType=Page}, Converter={StaticResource VisibleIfTrue}}"
+                                      Width="{Binding ElementName=ImprovementsStackPanel, Path=ActualWidth}" HorizontalAlignment="Left">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="3*"/>
                                         <ColumnDefinition Width="10*"/>
@@ -854,7 +872,16 @@
                                 </Grid>
 
                                 <ScrollViewer Grid.Row="2" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
-                                    <StackPanel>
+                                    <StackPanel x:Name="ImprovementsStackPanel">
+
+                                        <StackPanel.Resources>
+                                            <CollectionViewSource x:Key="ImprovementsViewSource" Source="{Binding Improvements}">
+                                                <CollectionViewSource.SortDescriptions>
+                                                    <scm:SortDescription PropertyName="Date" Direction="Ascending"/>
+                                                </CollectionViewSource.SortDescriptions>
+                                            </CollectionViewSource>
+                                        </StackPanel.Resources>
+                                        
                                         <Grid Margin="0 0 0 2" Visibility="{Binding AddingImprovement, RelativeSource={RelativeSource AncestorType=Page}, Converter={StaticResource VisibleIfTrue}}"
                                               DataContext="{Binding NewImprovement}">
                                             <Grid.ColumnDefinitions>
@@ -868,7 +895,7 @@
                                             <TextBox Grid.Column="2"  Name="newImprovementCostTextBox" Text="{Binding Cost, Mode=TwoWay}"/>
                                         </Grid>
 
-                                        <ItemsControl ItemsSource="{Binding Improvements}" Visibility="{Binding EditingImprovements, RelativeSource={RelativeSource AncestorType=Page}, Converter={StaticResource VisibleIfFalse}}">
+                                        <ItemsControl ItemsSource="{Binding Source={StaticResource ImprovementsViewSource}}" Visibility="{Binding EditingImprovements, RelativeSource={RelativeSource AncestorType=Page}, Converter={StaticResource VisibleIfFalse}}">
                                             <ItemsControl.ItemsPanel>
                                                 <ItemsPanelTemplate>
                                                     <StackPanel/>

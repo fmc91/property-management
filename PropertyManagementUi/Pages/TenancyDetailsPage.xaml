@@ -226,7 +226,7 @@
 
                         <TextBlock Grid.Row="0" FontSize="18" Margin="0 0 0 4" Text="Account"/>
 
-                        <Grid Grid.Row="1" Margin="0 0 0 2">
+                        <Grid Grid.Row="1" Margin="0 0 0 2" Width="{Binding ElementName=AccountEntries, Path=ActualWidth}" HorizontalAlignment="Left">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="4*"/>
                                 <ColumnDefinition Width="7*"/>
@@ -238,40 +238,42 @@
                             <TextBlock Grid.Column="2" FontWeight="Bold" Text="Amount"/>
                         </Grid>
 
-                        <ScrollViewer Grid.Row="2" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                        <Grid Grid.Row="2" MaxHeight="300">
+                            <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
 
-                            <ScrollViewer.Resources>
-                                <CollectionViewSource x:Key="AccountEntriesViewSource" Source="{Binding AccountEntries}">
-                                    <CollectionViewSource.SortDescriptions>
-                                        <scm:SortDescription PropertyName="Date" Direction="Ascending"/>
-                                    </CollectionViewSource.SortDescriptions>
-                                </CollectionViewSource>
-                            </ScrollViewer.Resources>
-                            
-                            <ItemsControl ItemsSource="{Binding Source={StaticResource AccountEntriesViewSource}}">
-                                <ItemsControl.ItemsPanel>
-                                    <ItemsPanelTemplate>
-                                        <StackPanel/>
-                                    </ItemsPanelTemplate>
-                                </ItemsControl.ItemsPanel>
+                                <ScrollViewer.Resources>
+                                    <CollectionViewSource x:Key="AccountEntriesViewSource" Source="{Binding AccountEntries}">
+                                        <CollectionViewSource.SortDescriptions>
+                                            <scm:SortDescription PropertyName="Date" Direction="Ascending"/>
+                                        </CollectionViewSource.SortDescriptions>
+                                    </CollectionViewSource>
+                                </ScrollViewer.Resources>
 
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate>
-                                        <Grid Margin="0 0 0 2">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="4*"/>
-                                                <ColumnDefinition Width="7*"/>
-                                                <ColumnDefinition Width="4*"/>
-                                            </Grid.ColumnDefinitions>
+                                <ItemsControl ItemsSource="{Binding Source={StaticResource AccountEntriesViewSource}}" x:Name="AccountEntries">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <StackPanel/>
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
 
-                                            <TextBlock Grid.Column="0" Text="{Binding Date, StringFormat='dd MMM yyyy'}"/>
-                                            <TextBlock Grid.Column="1" Text="{Binding Description}"/>
-                                            <TextBlock Grid.Column="2" Text="{Binding Amount, StringFormat='£##,#.00'}"/>
-                                        </Grid>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
-                        </ScrollViewer>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Grid Margin="0 0 0 2">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="4*"/>
+                                                    <ColumnDefinition Width="7*"/>
+                                                    <ColumnDefinition Width="4*"/>
+                                                </Grid.ColumnDefinitions>
+
+                                                <TextBlock Grid.Column="0" Text="{Binding Date, StringFormat='dd MMM yyyy'}"/>
+                                                <TextBlock Grid.Column="1" Text="{Binding Description}"/>
+                                                <TextBlock Grid.Column="2" Text="{Binding Amount, StringFormat='£##,#.00'}"/>
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </ScrollViewer>
+                        </Grid>
 
                         <StackPanel Grid.Row="3" Orientation="Horizontal" Margin="0 8 0 0">
                             <TextBlock VerticalAlignment="Center" TextAlignment="Right" FontWeight="Bold" Text="TOTAL" Margin="0 0 6 0"/>

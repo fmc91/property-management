@@ -473,26 +473,30 @@ namespace PropertyManagementUi
 
         private void EditImprovementsButtonClick(object sender, RoutedEventArgs e)
         {
-            ViewModel.ImprovementsForEdit = new ObservableCollection<Improvement>(ViewModel.Improvements.Select(i => new Improvement
-            {
-                ImprovementId = i.ImprovementId,
-                Date = i.Date,
-                Description = i.Description,
-                Cost = i.Cost
-            }));
+            ViewModel.ImprovementsForEdit = new ObservableCollection<Improvement>(ViewModel.Improvements
+                .OrderBy(i => i.Date)
+                .Select(i => new Improvement
+                {
+                    ImprovementId = i.ImprovementId,
+                    Date = i.Date,
+                    Description = i.Description,
+                    Cost = i.Cost
+                }));
 
             EditingImprovements = true;
         }
 
         private void EditExpensesButtonClick(object sender, RoutedEventArgs e)
         {
-            ViewModel.ExpensesForEdit = new ObservableCollection<Expense>(ViewModel.Expenses.Select(i => new Expense
-            {
-                ExpenseId  = i.ExpenseId,
-                Date = i.Date,
-                Description = i.Description,
-                Amount = i.Amount
-            }));
+            ViewModel.ExpensesForEdit = new ObservableCollection<Expense>(ViewModel.Expenses
+                .OrderBy(ex => ex.Date)
+                .Select(ex => new Expense
+                {
+                    ExpenseId  = ex.ExpenseId,
+                    Date = ex.Date,
+                    Description = ex.Description,
+                    Amount = ex.Amount
+                }));
 
             EditingExpenses = true;
         }
